@@ -45,7 +45,8 @@ Abra `http://localhost:8000`. La documentación API está en `/docs` y el estado
 ## Pruebas
 
 ```bash
-pytest -q
+python tests/smoke.py
+python tests/conversation_smoke.py
 ```
 
 Las pruebas cubren clasificación, fechas relativas en `America/El_Salvador`, rechazo
