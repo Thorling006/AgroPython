@@ -12,7 +12,7 @@ def classify_intent(text: str) -> str:
     msg = normalized(text)
     if re.fullmatch(r"hola|buenas|buenos dias|buenas tardes|buenas noches|menu|inicio", msg):
         return "menu"
-    if msg == "1" or re.search(r"\b(agricultura|agricola|plaga|enfermedad|cultivar|plantar|sembrar)\b", msg):
+    if msg == "1" or re.search(r"\b(agricultura|agricola|plagas?|enfermedades?|cultivar|plantar|sembrar)\b", msg):
         return "agriculture"
     if re.search(r"\b(ya|complete|completado|realice|realizado|termine|hecho|listo)\b.*\b(regue|riego|abone|abonado|fertilice|pode|fumigue|coseche|actividad)\b", msg):
         return "complete_activity"

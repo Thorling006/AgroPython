@@ -16,9 +16,8 @@ class ConversationService:
 
     async def handle(self, incoming: IncomingMessage) -> str | None:
         now = datetime.now(self.cfg.timezone)
-        if await self.repo.inbound_seen(incoming.message_id):
+        if not await self.repo.claim_inbound(incoming.message_id, incoming.phone):
             return None
-        await self.repo.register_inbound(incoming.message_id, incoming.phone)
         user = await self.repo.find_user_by_phone(incoming.phone)
         if not user:
             return "Hola 👋\n\nEste número de WhatsApp todavía no está asociado a una cuenta de AgroSmart.\n\nIngresa a AgroSmart y registra este número en tu perfil para utilizar el asistente."
@@ -68,7 +67,8 @@ class ConversationService:
                 reply = normalized(incoming.message)
                 if reply in {"1", "si", "sí"}:
                     draft = context["draft"]
-                    await self.repo.create_activity({"user_id": user["id"], "activity_type": draft["activity_type"], "description": draft["description"], "crop_name": draft["crop_name"], "scheduled_date": draft["scheduled_at"], "status": "pending", "whatsapp_reminder_sent": False})
+                    scheduled = datetime.fromisoformat(draft["scheduled_at"])
+                    await self.repo.create_activity({"user_id": user["id"], "activity_type": normalized(draft["activity_type"]), "description": draft["description"], "crop_name": draft["crop_name"], "scheduled_date": scheduled.date().isoformat(), "scheduled_at": scheduled.isoformat(), "status": "pendiente", "whatsapp_reminder_sent": False})
                     await self.repo.close_session(incoming.phone)
                     return "✅ Actividad programada correctamente."
                 if reply in {"2", "no"}:
@@ -112,7 +112,7 @@ class ConversationService:
             await self._save(incoming, user, "complete_activity", "waiting_confirmation", {"activity_ids": [chosen]}, now)
             return "¿Confirmas que deseas marcar esta actividad como realizada?\n\n1. Sí\n2. No"
         if reply in {"1", "si"} and ids:
-            updated = await self.repo.update_activity(str(ids[0]), user["id"], {"status": "completed", "completed_at": now.isoformat()})
+            updated = await self.repo.update_activity(str(ids[0]), user["id"], {"status": "realizado", "completed_at": now.isoformat()})
             await self.repo.close_session(incoming.phone)
             return "✅ Actividad marcada como realizada." if updated else "No se encontró la actividad o no pertenece a tu cuenta."
         if reply in {"2", "no"}:
@@ -130,14 +130,14 @@ class ConversationService:
             return "No pude identificar la actividad asociada al recordatorio."
         if step == "waiting_action":
             if reply in {"1", "realizada", "hecho", "listo"}:
-                row = await self.repo.update_activity(activity_id, user["id"], {"status": "completed", "completed_at": now.isoformat()})
+                row = await self.repo.update_activity(activity_id, user["id"], {"status": "realizado", "completed_at": now.isoformat()})
                 await self.repo.close_session(incoming.phone)
                 return "✅ Actividad marcada como realizada." if row else "No se encontró la actividad."
             if reply in {"2", "reprogramar"}:
                 await self._save(incoming, user, "activity_action", "waiting_new_datetime", context, now)
                 return "📅 ¿Para qué nueva fecha y hora deseas reprogramar la actividad?"
             if reply in {"3", "pendiente", "mantener pendiente", "no realizada"}:
-                await self.repo.update_activity(activity_id, user["id"], {"status": "pending"})
+                await self.repo.update_activity(activity_id, user["id"], {"status": "pendiente"})
                 await self.repo.close_session(incoming.phone)
                 return "Entendido 👍\nLa actividad seguirá apareciendo como pendiente."
             return "Responde 1 para completar, 2 para reprogramar o 3 para mantener pendiente."
@@ -146,7 +146,7 @@ class ConversationService:
         scheduled_at = parse_spanish_datetime(incoming.message, now=now)
         if not scheduled_at:
             return "No pude identificar una fecha futura válida. Ejemplo: mañana a las 7 am."
-        row = await self.repo.update_activity(activity_id, user["id"], {"status": "rescheduled", "scheduled_date": scheduled_at.isoformat(), "whatsapp_reminder_sent": False, "whatsapp_sent_at": None})
+        row = await self.repo.update_activity(activity_id, user["id"], {"status": "reprogramado", "scheduled_date": scheduled_at.date().isoformat(), "scheduled_at": scheduled_at.isoformat(), "whatsapp_reminder_sent": False, "whatsapp_sent_at": None})
         await self.repo.close_session(incoming.phone)
         return f"✅ Actividad reprogramada correctamente para:\n📅 {scheduled_at:%d/%m/%Y}\n🕐 {scheduled_at.strftime('%I:%M %p').lstrip('0')}" if row else "No se encontró la actividad."
 

@@ -195,7 +195,8 @@ async function fetchOpenRouterAPI(messages) {
     const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem('agropython_access_token') || ''}`
         },
         body: JSON.stringify({
             message: messages[messages.length - 1].content,

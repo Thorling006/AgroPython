@@ -9,9 +9,9 @@ Intent = Literal["menu", "agriculture", "list_activities", "create_activity", "l
 
 class IncomingMessage(BaseModel):
     phone: str
-    name: str = "Agricultor"
-    message: str
-    message_id: str
+    name: str = Field(default="Agricultor", max_length=160)
+    message: str = Field(min_length=1, max_length=4096)
+    message_id: str = Field(min_length=8, max_length=255)
 
 
 class ConversationState(BaseModel):
@@ -42,4 +42,16 @@ class ChatRequest(BaseModel):
     history: list[dict[str, str]] = Field(default_factory=list, max_length=20)
     mode: Literal["agriculture", "jarvis"] = "agriculture"
     page_context: str = Field(default="", max_length=3000)
+
+
+class LoginRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=6, max_length=256)
+
+
+class AuthenticatedUser(BaseModel):
+    id: str
+    email: str | None = None
+    role: str = "farmer"
+    is_superuser: bool = False
 

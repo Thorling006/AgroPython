@@ -491,7 +491,10 @@ CONVERSACIÓN CONTINUA Y DESPEDIDA:
             try {
                 const backendResponse = await fetch('/api/ai/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('agropython_access_token') || ''}`
+                    },
                     body: JSON.stringify({
                         message: text,
                         history: this.chatHistory.slice(0, -1),

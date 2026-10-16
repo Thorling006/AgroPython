@@ -1677,80 +1677,27 @@ window.DB = windowDB;
 // Helper Auth Methods
 window.AuthObj = {
     login: async function(email, password) {
-        console.log("Intentando login para:", email);
-        const user = await window.DB.getUserByEmail(email);
-        if (user) {
-            console.log("Usuario encontrado en DB. Verificando password...");
-            const hashedInput = await window.DB.hashPassword(password);
-            
-            if (user.password === hashedInput) {
-                // Check if user is currently suspended
-                if (user.suspension_end && new Date(user.suspension_end) > new Date()) {
-                    const suspensionEnd = new Date(user.suspension_end);
-                    const isPermanent = suspensionEnd.getFullYear() === 2100;
-                    const blockText = isPermanent 
-                        ? `<p class="mb-3 fw-bold text-danger fs-5">Tu cuenta ha sido bloqueada PERMANENTEMENTE.</p>`
-                        : `<p class="mb-3 text-muted">Tu cuenta ha sido bloqueada hasta ${suspensionEnd.toLocaleDateString()}.</p>`;
-
-                    const SwalConfig = {
-                        icon: 'error',
-                        title: 'Cuenta Suspendida', 
-                        html: `
-                            ${blockText}
-                            <div class="p-3 bg-light rounded text-start mb-3 border">
-                                <strong>Motivo:</strong><br>
-                                ${user.suspension_reason || 'Infracción a las políticas'}
-                            </div>
-                            ${!isPermanent ? '<p class="small text-muted mb-0">¿Deseas enviar una carta de apelación al administrador?</p>' : ''}
-                        `,
-                        showCancelButton: true,
-                        cancelButtonText: 'Cerrar',
-                        confirmButtonColor: 'var(--primary-color)'
-                    };
-
-                    if (!isPermanent) {
-                        SwalConfig.input = 'textarea';
-                        SwalConfig.inputPlaceholder = 'Escribe aquí tu justificación o carta de perdón...';
-                        SwalConfig.inputAttributes = { rows: 4 };
-                        SwalConfig.confirmButtonText = 'Enviar Apelación';
-                    } else {
-                        SwalConfig.showConfirmButton = false;
-                        SwalConfig.cancelButtonText = 'Aceptar y Salir';
-                        SwalConfig.cancelButtonColor = '#dc3545';
-                    }
-
-                    const { isConfirmed, value } = await Swal.fire(SwalConfig);
-
-                    if (!isPermanent && isConfirmed && value && user.suspended_by) {
-                        try {
-                            await window.DB.sendMessage({
-                                sender_id: user.id,
-                                receiver_id: user.suspended_by,
-                                text: `[CARTA DE APELACIÓN]\n${value}`
-                            });
-                            window.showSuccessModal('Apelación Enviada', 'El administrador revisará tu caso pronto.');
-                        } catch (err) {
-                            window.showErrorModal('Error', 'No se pudo enviar la apelación: ' + err.message);
-                        }
-                    }
-
-                    return false;
-                }
-
-                console.log("¡Login exitoso!");
-                sessionStorage.setItem('current_user_id', user.id);
-                sessionStorage.setItem('show_welcome_modal', 'true');
-                return true;
-            } else {
-                console.warn("Mismatch de contraseñas.");
-            }
-        } else {
-            console.warn("Usuario no encontrado en la base de datos.");
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            if (!response.ok) return false;
+            const data = await response.json();
+            sessionStorage.setItem('agropython_access_token', data.access_token);
+            sessionStorage.setItem('current_user_id', data.user.id);
+            localStorage.setItem('agrosmart_user_cache', JSON.stringify(data.user));
+            sessionStorage.setItem('show_welcome_modal', 'true');
+            return true;
+        } catch (error) {
+            console.warn('No se pudo iniciar sesión contra AgroPython.', error);
+            return false;
         }
-        return false;
     },
     logout: function() {
         sessionStorage.removeItem('current_user_id');
+        sessionStorage.removeItem('agropython_access_token');
         localStorage.removeItem('agrosmart_user_cache');
         window.location.href = 'index.html';
     },

@@ -1,54 +1,55 @@
 # AgroPython
 
-Migración de AgroSmart a una arquitectura Python con FastAPI. Conserva el panel web,
-la integración con Supabase, el webhook de WhatsApp Business Cloud, Gemini, sesiones
-con expiración, deduplicación, actividades agrícolas y recordatorios automáticos.
+Migración incremental de AgroSmart a FastAPI. Conserva el panel web y prepara un
+backend seguro para Supabase, WhatsApp Business Cloud, Gemini, sesiones y
+recordatorios automáticos.
 
-## Arquitectura
+> **Estado:** listo para desplegar en pruebas, no validado aún con integraciones
+> reales. No cambie el webhook productivo ni desactive n8n antes de completar
+> [el procedimiento de despliegue](docs/DEPLOYMENT_RAILWAY.md).
 
-- `app/main.py`: aplicación FastAPI y programador periódico.
-- `app/routers/webhook.py`: verificación y recepción del webhook de Meta.
-- `app/routers/activities.py`: API multiusuario para listar/completar/reprogramar.
-- `app/services/conversation.py`: máquina de estados conversacional persistente.
-- `app/services/reminders.py`: envío idempotente de recordatorios vencidos.
-- `app/services/supabase.py`: acceso server-side a Supabase REST.
-- `app/services/gemini.py`: asesor agrícola especializado.
-- `app/static/`: interfaz visual original preservada.
+## Componentes
 
-## Seguridad
-
-No se incluyen secretos. Copie `.env.example` a `.env` y configure variables en el
-entorno de despliegue. La service role de Supabase y los tokens de Meta/Gemini nunca
-deben exponerse en el frontend.
+- `app/main.py`: FastAPI, frontend, healthchecks y scheduler opcional.
+- `app/routers/webhook.py`: webhook con firma `X-Hub-Signature-256`.
+- `app/routers/auth.py`: login server-side compatible con hashes heredados.
+- `app/routers/activities.py`: operaciones protegidas por identidad JWT.
+- `app/services/conversation.py`: estado persistente y expiración.
+- `app/services/reminders.py`: reclamación atómica, reintentos y backoff.
+- `migrations/20261016_agropython_runtime.sql`: runtime idempotente.
+- `app/static/`: panel original preservado durante la migración.
 
 ## Ejecución local
 
-```bash
+```powershell
 python -m venv .venv
-.venv\\Scripts\\activate
-pip install -r requirements.txt
-copy .env.example .env
+.venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+Copy-Item .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Abra `http://localhost:8000`. La documentación API está en `/docs` y el estado en
-`/health`.
-
-## Despliegue en Railway
-
-1. Conecte este repositorio a un servicio Railway.
-2. Configure las variables de `.env.example` en Railway Variables.
-3. Publique el dominio HTTPS.
-4. En Meta configure `https://SU-DOMINIO/webhooks/whatsapp` como callback.
-5. Mantenga el mismo verify token en Meta y Railway.
+Abra `http://localhost:8000`. OpenAPI está en `/docs`, liveness en
+`/health/live` y readiness en `/health/ready`.
 
 ## Pruebas
 
-```bash
+```powershell
+python -m pytest -q
 python tests/smoke.py
 python tests/conversation_smoke.py
 ```
 
-Las pruebas cubren clasificación, fechas relativas en `America/El_Salvador`, rechazo
-de fechas pasadas y extracción de actividad/cultivo.
+La suite cubre parsers, fechas salvadoreñas, expiración, duplicados, aislamiento,
+autenticación, firma de Meta, errores de integraciones, recordatorios y panel.
 
+## Seguridad y limitaciones
+
+- Los secretos solo se cargan desde variables de entorno.
+- Las claves privadas nunca deben llegar al navegador.
+- El frontend heredado aún consulta varias tablas con la clave anónima. Sus RLS
+  deben migrarse antes de una apertura pública; endurecerlas ahora rompería el panel.
+- El SHA-256 heredado se verifica temporalmente en servidor. Debe migrarse de forma
+  controlada a Argon2/bcrypt sin cambiar contraseñas reales de forma abrupta.
+
+Consulte [el informe de auditoría](docs/AUDIT_REPORT.md).

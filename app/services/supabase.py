@@ -16,7 +16,7 @@ class SupabaseRepository:
             "Content-Type": "application/json",
         }
 
-    async def _request(self, method: str, table: str, *, params=None, json=None, prefer: str | None = None) -> list[dict[str, Any]]:
+    async def _request(self, method: str, table: str, *, params=None, json=None, prefer: str | None = None) -> Any:
         headers = dict(self.headers)
         if prefer:
             headers["Prefer"] = prefer
@@ -29,12 +29,26 @@ class SupabaseRepository:
         rows = await self._request("GET", "users", params={"phone": f"eq.{phone}", "select": "*", "limit": "1"})
         return rows[0] if rows else None
 
-    async def inbound_seen(self, message_id: str) -> bool:
-        rows = await self._request("GET", "whatsapp_inbound_events", params={"message_id": f"eq.{message_id}", "select": "message_id", "limit": "1"})
-        return bool(rows)
+    async def find_user_by_email(self, email: str) -> dict | None:
+        rows = await self._request("GET", "users", params={"email": f"eq.{email}", "select": "*", "limit": "1"})
+        return rows[0] if rows else None
 
-    async def register_inbound(self, message_id: str, phone: str) -> None:
-        await self._request("POST", "whatsapp_inbound_events", json={"message_id": message_id, "phone": phone}, prefer="return=minimal")
+    async def find_user_by_id(self, user_id: str) -> dict | None:
+        rows = await self._request("GET", "users", params={"id": f"eq.{user_id}", "select": "*", "limit": "1"})
+        return rows[0] if rows else None
+
+    async def claim_inbound(self, message_id: str, phone: str) -> bool:
+        result = await self._request("POST", "rpc/claim_whatsapp_inbound", json={"p_message_id": message_id, "p_phone": phone})
+        if not result:
+            return False
+        value = result[0] if isinstance(result, list) else result
+        return bool(value.get("claim_whatsapp_inbound") if isinstance(value, dict) else value)
+
+    async def mark_inbound_completed(self, message_id: str) -> None:
+        await self._request("PATCH", "whatsapp_inbound_events", params={"message_id": f"eq.{message_id}"}, json={"status": "completed", "processed_at": datetime.utcnow().isoformat(), "last_error": None}, prefer="return=minimal")
+
+    async def mark_inbound_failed(self, message_id: str, error: str) -> None:
+        await self._request("PATCH", "whatsapp_inbound_events", params={"message_id": f"eq.{message_id}"}, json={"status": "failed", "last_error": error[:1000]}, prefer="return=minimal")
 
     async def get_active_session(self, phone: str, now: datetime) -> dict | None:
         rows = await self._request("GET", "conversation_state", params={"phone": f"eq.{phone}", "expires_at": f"gt.{now.isoformat()}", "select": "*", "order": "updated_at.desc", "limit": "1"})
@@ -61,6 +75,12 @@ class SupabaseRepository:
         rows = await self._request("PATCH", "crop_activities", params={"id": f"eq.{activity_id}", "user_id": f"eq.{user_id}"}, json=data, prefer="return=representation")
         return rows[0] if rows else None
 
-    async def due_activities(self, now: datetime) -> list[dict]:
-        return await self._request("GET", "crop_activities", params={"scheduled_date": f"lte.{now.isoformat()}", "status": "in.(pending,pendiente,rescheduled,reprogramada)", "whatsapp_reminder_sent": "eq.false", "select": "*,users(phone,name)", "order": "scheduled_date.asc", "limit": "100"})
+    async def claim_due_activities(self, batch_size: int = 50) -> list[dict]:
+        return await self._request("POST", "rpc/claim_due_crop_activities", json={"p_batch_size": batch_size})
+
+    async def complete_reminder_claim(self, activity: dict, message_id: str, sent_at: datetime) -> None:
+        await self.update_activity(str(activity["id"]), str(activity["user_id"]), {"whatsapp_reminder_sent": True, "whatsapp_sent_at": sent_at.isoformat(), "whatsapp_message_id": message_id, "whatsapp_claim_token": None, "whatsapp_claimed_at": None, "whatsapp_last_error": None})
+
+    async def release_reminder_claim(self, activity: dict, error: str, retry_at: datetime) -> None:
+        await self.update_activity(str(activity["id"]), str(activity["user_id"]), {"whatsapp_claim_token": None, "whatsapp_claimed_at": None, "whatsapp_last_error": error[:1000], "whatsapp_next_attempt_at": retry_at.isoformat()})
 

@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+import hashlib
+import hmac
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
 from app.config import Settings, get_settings
@@ -21,8 +24,18 @@ async def verify(request: Request, settings: Settings = Depends(get_settings)) -
 
 
 @router.post("")
-async def receive(request: Request) -> dict:
-    payload = await request.json()
+async def receive(request: Request, settings: Settings = Depends(get_settings)) -> dict:
+    body = await request.body()
+    if len(body) > 1_048_576:
+        raise HTTPException(status_code=413, detail="Payload demasiado grande")
+    signature = request.headers.get("x-hub-signature-256", "")
+    expected = "sha256=" + hmac.new(settings.meta_app_secret.encode(), body, hashlib.sha256).hexdigest()
+    if not settings.meta_app_secret or not hmac.compare_digest(signature, expected):
+        raise HTTPException(status_code=401, detail="Firma de Meta inválida")
+    try:
+        payload = await request.json()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="JSON inválido") from exc
     try:
         value = payload["entry"][0]["changes"][0]["value"]
         if not value.get("messages"):
@@ -35,8 +48,20 @@ async def receive(request: Request) -> dict:
     except (KeyError, IndexError, ValueError) as exc:
         raise HTTPException(status_code=400, detail="Payload de WhatsApp inválido") from exc
     service = ConversationService(SupabaseRepository(), GeminiClient())
-    answer = await service.handle(incoming)
-    if answer:
+    try:
+        answer = await service.handle(incoming)
+    except Exception as exc:
+        try:
+            await service.repo.mark_inbound_failed(incoming.message_id, str(exc))
+        finally:
+            raise HTTPException(status_code=503, detail="No se pudo procesar el mensaje") from exc
+    if not answer:
+        return {"status": "duplicate"}
+    try:
         await WhatsAppClient().send_text(incoming.phone, answer)
-    return {"status": "processed" if answer else "duplicate"}
+        await service.repo.mark_inbound_completed(incoming.message_id)
+    except Exception as exc:
+        await service.repo.mark_inbound_failed(incoming.message_id, str(exc))
+        raise HTTPException(status_code=502, detail="No se pudo enviar la respuesta por WhatsApp") from exc
+    return {"status": "processed"}
 
