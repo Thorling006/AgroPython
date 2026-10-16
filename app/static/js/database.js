@@ -18,24 +18,27 @@ class Database {
         this.initLocalDB();
     }
 
+    async api(path, options = {}, authenticated = true) {
+        const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+        if (authenticated) {
+            const token = sessionStorage.getItem('agropython_access_token');
+            if (!token) throw new Error('Sesión no autenticada');
+            headers.Authorization = `Bearer ${token}`;
+        }
+        const response = await fetch(path, { ...options, headers });
+        if (response.status === 204) return null;
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || `Error HTTP ${response.status}`);
+        return data;
+    }
+
     async runMidnightChatCleanup() {
         const lastClearDateStr = localStorage.getItem('last_chat_cleanup');
         const todayStr = new Date().toISOString().split('T')[0];
 
         if (lastClearDateStr !== todayStr) {
             console.log("🌟 Medianoche detectada: Ejecutando borrado total de historiales de chat para liberar caché.");
-            if (this.supabase) {
-                try {
-                    if (navigator.onLine) {
-                        const { error } = await this.supabase.from('messages').delete().neq('id', 0);
-                        if (error) console.warn("Error limpiando chats en Supabase:", error);
-                    }
-                } catch(e) {
-                    console.warn("Fallo borrado de Supabase (posiblemente offline):", e.message);
-                }
-            } 
-            
-            // Local fallback cleanup
+            // Solo limpia la caché local. Nunca borra conversaciones remotas globalmente.
             const db = this.getLocalDB();
             if (db) {
                 db.messages = [];
@@ -94,6 +97,9 @@ class Database {
 
     async getUserById(id) {
         if (!id) return null;
+        if (navigator.onLine && String(id) === String(sessionStorage.getItem('current_user_id'))) {
+            try { return await this.api('/api/users/me'); } catch (e) { console.warn('[API] Perfil:', e.message); }
+        }
         if (this.supabase && navigator.onLine) {
             try {
                 const { data, error } = await this.supabase.from('users').select('*').eq('id', id).maybeSingle();
@@ -114,6 +120,19 @@ class Database {
     }
 
     async createUser(userObj) {
+        if (navigator.onLine) {
+            return (await this.api('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: userObj.email,
+                    password: userObj.password,
+                    full_name: userObj.full_name || userObj.name,
+                    phone: userObj.phone || userObj.whatsapp || null,
+                    country_id: userObj.country_id || null,
+                    org_id: userObj.org_id || null
+                })
+            }, false)).user;
+        }
         const hashedPassword = await this.hashPassword(userObj.password);
         const baseUser = {
             ...userObj,
@@ -193,6 +212,11 @@ class Database {
         const endDate = hours === 999999 ? new Date(2100, 0, 1) : new Date(Date.now() + (hours * 60 * 60 * 1000));
         const endIso = endDate.toISOString();
 
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/admin/users/${encodeURIComponent(userId)}`, { method: 'PATCH', body: JSON.stringify({ suspension_end: endIso, suspension_reason: reason, suspended_by: adminId }) });
+            return;
+        }
+
         if (this.supabase) {
             try {
                 const { error } = await this.supabase.from('users').update({
@@ -214,6 +238,10 @@ class Database {
     }
 
     async removeSuspension(userId) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/admin/users/${encodeURIComponent(userId)}`, { method: 'PATCH', body: JSON.stringify({ suspension_end: null, suspension_reason: null, suspended_by: null }) });
+            return;
+        }
         if (this.supabase) {
             try {
                 const { error } = await this.supabase.from('users').update({
@@ -235,6 +263,10 @@ class Database {
     }
 
     async setAdminStatus(userId, isSuperUser, role = 'farmer', plan = null) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/admin/users/${encodeURIComponent(userId)}`, { method: 'PATCH', body: JSON.stringify({ is_superuser: isSuperUser, role, ...(plan ? { plan } : {}) }) });
+            return;
+        }
         if (this.supabase) {
             try {
                 const updateData = { is_superuser: isSuperUser, role: role };
@@ -255,6 +287,10 @@ class Database {
     }
 
     async updateUserPlan(userId, plan) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/admin/users/${encodeURIComponent(userId)}`, { method: 'PATCH', body: JSON.stringify({ plan }) });
+            return;
+        }
         if (this.supabase) {
             try {
                 const { error } = await this.supabase.from('users').update({ plan: plan }).eq('id', userId);
@@ -274,6 +310,11 @@ class Database {
     async updateUserAffiliation(userId, countryId, orgId) {
         // Handle "none" selection as null for database
         const processedOrgId = orgId === 'none' ? null : orgId;
+
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/admin/users/${encodeURIComponent(userId)}`, { method: 'PATCH', body: JSON.stringify({ country_id: countryId, org_id: processedOrgId }) });
+            return;
+        }
 
         if (this.supabase) {
             try {
@@ -295,6 +336,9 @@ class Database {
     }
 
     async getAllUsers(currentUser = null) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            try { return await this.api('/api/users'); } catch (e) { console.warn('[API] Directorio:', e.message); }
+        }
         if (this.supabase) {
             let query = this.supabase.from('users').select('*');
             if (currentUser) {
@@ -342,6 +386,10 @@ class Database {
     }
 
     async updateUserPassword(userId, newPassword) {
+        if (navigator.onLine && String(userId) === String(sessionStorage.getItem('current_user_id'))) {
+            await this.api('/api/users/me/password', { method: 'PATCH', body: JSON.stringify({ new_password: newPassword }) });
+            return;
+        }
         const hashedPassword = await this.hashPassword(newPassword);
         if (this.supabase) {
             const { error } = await this.supabase.from('users').update({ password: hashedPassword }).eq('id', userId);
@@ -354,6 +402,11 @@ class Database {
     }
 
     async updateUserProfile(userId, profileData) {
+        if (navigator.onLine && String(userId) === String(sessionStorage.getItem('current_user_id'))) {
+            const updated = await this.api('/api/users/me', { method: 'PATCH', body: JSON.stringify(profileData) });
+            localStorage.setItem('agrosmart_user_cache', JSON.stringify(updated));
+            return updated;
+        }
         if (this.supabase) {
             try {
                 const updatePayload = {
@@ -391,6 +444,10 @@ class Database {
     }
 
     async deleteUser(id) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE' });
+            return;
+        }
         if (this.supabase) {
             await this.supabase.from('crops').delete().eq('user_id', id);
             await this.supabase.from('posts').delete().eq('user_id', id);
@@ -704,6 +761,9 @@ class Database {
 
     // --- Chat Messages ---
     async getMessages(userId1, userId2) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            return await this.api(`/api/messages/direct/${encodeURIComponent(userId2)}`);
+        }
         if (this.supabase && navigator.onLine) {
             const { data, error } = await this.supabase
                 .from('messages')
@@ -767,6 +827,9 @@ class Database {
     }
 
     async getGroupMessages(groupId) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            return await this.api(`/api/messages/group/${encodeURIComponent(groupId)}`);
+        }
         if (this.supabase) {
             const { data, error } = await this.supabase
                 .from('messages')
@@ -788,6 +851,14 @@ class Database {
             is_read: false
         };
 
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            return await this.api('/api/messages', { method: 'POST', body: JSON.stringify({
+                receiver_id: messageObj.receiver_id || null,
+                group_id: messageObj.group_id || null,
+                text: messageObj.text
+            }) });
+        }
+
         if (this.supabase) {
             const { data, error } = await this.supabase.from('messages').insert([payload]).select().single();
             if (error) throw new Error(error.message);
@@ -801,6 +872,10 @@ class Database {
     }
 
     async markAsRead(senderId, receiverId) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            await this.api(`/api/messages/direct/${encodeURIComponent(senderId)}/read`, { method: 'PATCH' });
+            return;
+        }
         if (this.supabase) {
             const { error } = await this.supabase.from('messages')
                 .update({ is_read: true })
@@ -1405,6 +1480,17 @@ class Database {
             created_at: new Date().toISOString()
         };
 
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            const time = String(activityObj.scheduled_time || '08:00').slice(0, 5);
+            return await this.api('/api/activities', { method: 'POST', body: JSON.stringify({
+                crop_id: activityObj.crop_id || null,
+                activity_type: activityObj.activity_type,
+                crop_name: activityObj.crop_name || null,
+                description: activityObj.description || null,
+                scheduled_at: `${activityObj.scheduled_date}T${time}:00-06:00`
+            }) });
+        }
+
         if (this.supabase) {
             try {
                 const { data, error } = await this.supabase
@@ -1433,6 +1519,10 @@ class Database {
      */
     async getCropActivitiesByUser(userId) {
         if (!userId) return [];
+
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            try { return await this.api('/api/activities'); } catch (e) { console.warn('[API] Actividades:', e.message); }
+        }
 
         if (this.supabase && navigator.onLine) {
             try {
@@ -1469,6 +1559,10 @@ class Database {
      */
     async createCropActivitiesBulk(activities) {
         if (!activities || activities.length === 0) return [];
+
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            return await Promise.all(activities.map(activity => this.createCropActivity(activity)));
+        }
 
         const payloads = activities.map(a => ({
             crop_id: a.crop_id,
@@ -1509,6 +1603,9 @@ class Database {
      * Get all activities for a specific crop
      */
     async getCropActivitiesByCrop(cropId) {
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            try { return await this.api(`/api/activities/crop/${encodeURIComponent(cropId)}`); } catch (e) { console.warn('[API] Actividades cultivo:', e.message); }
+        }
         if (this.supabase && navigator.onLine) {
             try {
                 const { data, error } = await this.supabase
@@ -1567,6 +1664,11 @@ class Database {
             updatePayload.completed_at = new Date().toISOString();
         }
 
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            const action = status === 'realizado' ? 'complete' : 'keep_pending';
+            return await this.api(`/api/activities/${encodeURIComponent(activityId)}`, { method: 'PATCH', body: JSON.stringify({ activity_id: String(activityId), action }) });
+        }
+
         if (this.supabase) {
             try {
                 const { data, error } = await this.supabase
@@ -1598,6 +1700,9 @@ class Database {
     async rescheduleCropActivity(activityId, scheduledDate, scheduledTime) {
         const normalizedTime = String(scheduledTime || '').slice(0, 5);
         const target = new Date(`${scheduledDate}T${normalizedTime}:00`);
+        if (navigator.onLine && sessionStorage.getItem('agropython_access_token')) {
+            return await this.api(`/api/activities/${encodeURIComponent(activityId)}`, { method: 'PATCH', body: JSON.stringify({ activity_id: String(activityId), action: 'reschedule', scheduled_at: target.toISOString() }) });
+        }
         if (!scheduledDate || !normalizedTime || Number.isNaN(target.getTime())) {
             throw new Error('Fecha u hora de reprogramación inválida.');
         }

@@ -37,6 +37,25 @@ class SupabaseRepository:
         rows = await self._request("GET", "users", params={"id": f"eq.{user_id}", "select": "*", "limit": "1"})
         return rows[0] if rows else None
 
+    async def create_user(self, data: dict) -> dict:
+        rows = await self._request("POST", "users", json=data, prefer="return=representation")
+        return rows[0]
+
+    async def update_user(self, user_id: str, data: dict) -> dict | None:
+        rows = await self._request("PATCH", "users", params={"id": f"eq.{user_id}"}, json=data, prefer="return=representation")
+        return rows[0] if rows else None
+
+    async def directory_users(self, user: dict) -> list[dict]:
+        params = {"select": "id,email,full_name,avatar_url,bio,role,country_id,org_id,is_superuser"}
+        role = user.get("role") or "farmer"
+        if role == "ministry_admin":
+            params["or"] = f"(country_id.eq.{user.get('country_id')},role.eq.global_owner)"
+        elif role == "org_admin":
+            params["country_id"] = f"eq.{user.get('country_id')}"
+        elif role == "farmer":
+            params["or"] = f"(and(role.eq.ministry_admin,country_id.eq.{user.get('country_id')}),role.eq.global_owner,id.eq.{user['id']})"
+        return await self._request("GET", "users", params=params)
+
     async def claim_inbound(self, message_id: str, phone: str) -> bool:
         result = await self._request("POST", "rpc/claim_whatsapp_inbound", json={"p_message_id": message_id, "p_phone": phone})
         if not result:
@@ -71,6 +90,9 @@ class SupabaseRepository:
         rows = await self._request("POST", "crop_activities", json=data, prefer="return=representation")
         return rows[0]
 
+    async def list_activities_for_crop(self, user_id: str, crop_id: str) -> list[dict]:
+        return await self._request("GET", "crop_activities", params={"user_id": f"eq.{user_id}", "crop_id": f"eq.{crop_id}", "select": "*", "order": "scheduled_date.asc"})
+
     async def update_activity(self, activity_id: str, user_id: str, data: dict) -> dict | None:
         rows = await self._request("PATCH", "crop_activities", params={"id": f"eq.{activity_id}", "user_id": f"eq.{user_id}"}, json=data, prefer="return=representation")
         return rows[0] if rows else None
@@ -83,4 +105,30 @@ class SupabaseRepository:
 
     async def release_reminder_claim(self, activity: dict, error: str, retry_at: datetime) -> None:
         await self.update_activity(str(activity["id"]), str(activity["user_id"]), {"whatsapp_claim_token": None, "whatsapp_claimed_at": None, "whatsapp_last_error": error[:1000], "whatsapp_next_attempt_at": retry_at.isoformat()})
+
+    async def direct_messages(self, user_id: str, peer_id: str) -> list[dict]:
+        expression = f"(and(sender_id.eq.{user_id},receiver_id.eq.{peer_id}),and(sender_id.eq.{peer_id},receiver_id.eq.{user_id}))"
+        return await self._request("GET", "messages", params={"group_id": "is.null", "or": expression, "select": "*", "order": "timestamp.asc"})
+
+    async def user_in_group(self, user_id: str, group_id: str) -> bool:
+        rows = await self._request("GET", "chat_group_members", params={"user_id": f"eq.{user_id}", "group_id": f"eq.{group_id}", "select": "group_id", "limit": "1"})
+        return bool(rows)
+
+    async def group_messages(self, group_id: str) -> list[dict]:
+        return await self._request("GET", "messages", params={"group_id": f"eq.{group_id}", "select": "*", "order": "timestamp.asc"})
+
+    async def create_message(self, data: dict) -> dict:
+        rows = await self._request("POST", "messages", json=data, prefer="return=representation")
+        return rows[0]
+
+    async def mark_messages_read(self, user_id: str, sender_id: str) -> None:
+        await self._request("PATCH", "messages", params={"sender_id": f"eq.{sender_id}", "receiver_id": f"eq.{user_id}"}, json={"is_read": True}, prefer="return=minimal")
+
+    async def delete_user_cascade(self, user_id: str) -> None:
+        for table, key in (("crop_activities", "user_id"), ("crops", "user_id"), ("posts", "user_id"), ("post_comments", "user_id"), ("chat_group_members", "user_id"), ("chat_groups", "created_by")):
+            await self._request("DELETE", table, params={key: f"eq.{user_id}"}, prefer="return=minimal")
+        await self._request("DELETE", "messages", params={"or": f"(sender_id.eq.{user_id},receiver_id.eq.{user_id})"}, prefer="return=minimal")
+        await self._request("DELETE", "friendships", params={"or": f"(user_id1.eq.{user_id},user_id2.eq.{user_id})"}, prefer="return=minimal")
+        await self._request("PATCH", "users", params={"suspended_by": f"eq.{user_id}"}, json={"suspended_by": None}, prefer="return=minimal")
+        await self._request("DELETE", "users", params={"id": f"eq.{user_id}"}, prefer="return=minimal")
 

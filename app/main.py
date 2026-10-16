@@ -10,7 +10,7 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.routers import activities, ai, auth, webhook
+from app.routers import activities, admin, ai, auth, messages, users, webhook
 from app.services.reminders import dispatch_due_reminders
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -50,6 +50,9 @@ app.include_router(webhook.router)
 app.include_router(activities.router)
 app.include_router(ai.router)
 app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(messages.router)
+app.include_router(admin.router)
 @app.get("/health")
 async def health(cfg = Depends(get_settings)) -> dict:
     return {"status": "ok", "environment": cfg.app_env, "integrations_configured": cfg.production_ready}
@@ -62,7 +65,7 @@ async def liveness() -> dict:
 
 @app.get("/health/ready", include_in_schema=False)
 async def readiness(cfg = Depends(get_settings)) -> Response:
-    ready = cfg.supabase_ready and cfg.auth_ready
+    ready = cfg.supabase_ready and cfg.auth_ready and cfg.rate_limit_ready
     return Response(content=json.dumps({"status": "ready" if ready else "not_ready"}), media_type="application/json", status_code=200 if ready else 503)
 
 

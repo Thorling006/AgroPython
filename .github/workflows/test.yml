@@ -17,4 +17,6 @@ jobs:
       - run: python -m pytest -q
       - run: python tests/smoke.py
       - run: python tests/conversation_smoke.py
+      - name: Build Linux container
+        run: docker build -t agropython:test .
 

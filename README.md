@@ -14,6 +14,7 @@ recordatorios automáticos.
 - `app/routers/webhook.py`: webhook con firma `X-Hub-Signature-256`.
 - `app/routers/auth.py`: login server-side compatible con hashes heredados.
 - `app/routers/activities.py`: operaciones protegidas por identidad JWT.
+- `app/routers/users.py`, `messages.py`, `admin.py`: datos privados y autorización.
 - `app/services/conversation.py`: estado persistente y expiración.
 - `app/services/reminders.py`: reclamación atómica, reintentos y backoff.
 - `migrations/20261016_agropython_runtime.sql`: runtime idempotente.
@@ -41,14 +42,16 @@ python tests/conversation_smoke.py
 ```
 
 La suite cubre parsers, fechas salvadoreñas, expiración, duplicados, aislamiento,
-autenticación, firma de Meta, errores de integraciones, recordatorios y panel.
+autenticación, autorización administrativa, rate limiting Redis, firma de Meta,
+errores de integraciones, recordatorios y panel. CI también construye Docker Linux.
 
 ## Seguridad y limitaciones
 
 - Los secretos solo se cargan desde variables de entorno.
 - Las claves privadas nunca deben llegar al navegador.
-- El frontend heredado aún consulta varias tablas con la clave anónima. Sus RLS
-  deben migrarse antes de una apertura pública; endurecerlas ahora rompería el panel.
+- Identidad, actividades y mensajes ya usan FastAPI. Las áreas sociales, cultivos y
+  soporte que aún consultan Supabase están inventariadas en
+  [`docs/FRONTEND_SUPABASE_ACCESS.md`](docs/FRONTEND_SUPABASE_ACCESS.md).
 - El SHA-256 heredado se verifica temporalmente en servidor. Debe migrarse de forma
   controlada a Argon2/bcrypt sin cambiar contraseñas reales de forma abrupta.
 

@@ -49,6 +49,54 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=6, max_length=256)
 
 
+class RegistrationRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=8, max_length=256)
+    full_name: str = Field(min_length=2, max_length=160)
+    phone: str | None = Field(default=None, max_length=32)
+    country_id: str | None = None
+    org_id: str | None = None
+
+
+class ProfileUpdate(BaseModel):
+    full_name: str | None = Field(default=None, min_length=2, max_length=160)
+    avatar_url: str | None = Field(default=None, max_length=2048)
+    bio: str | None = Field(default=None, max_length=1000)
+    phone: str | None = Field(default=None, max_length=32)
+    phone_country_code: str | None = Field(default=None, max_length=8)
+    whatsapp: str | None = Field(default=None, max_length=32)
+    whatsapp_opt_in: bool | None = None
+
+
+class PasswordUpdate(BaseModel):
+    new_password: str = Field(min_length=8, max_length=256)
+
+
+class ActivityCreate(BaseModel):
+    crop_id: str | None = None
+    activity_type: str = Field(min_length=2, max_length=80)
+    crop_name: str | None = Field(default=None, max_length=160)
+    description: str | None = Field(default=None, max_length=1000)
+    scheduled_at: datetime
+
+
+class MessageCreate(BaseModel):
+    receiver_id: str | None = None
+    group_id: str | None = None
+    text: str = Field(min_length=1, max_length=4000)
+
+
+class AdminUserUpdate(BaseModel):
+    suspension_end: datetime | None = None
+    suspension_reason: str | None = Field(default=None, max_length=1000)
+    suspended_by: str | None = None
+    is_superuser: bool | None = None
+    role: Literal["farmer", "org_admin", "ministry_admin", "global_owner"] | None = None
+    plan: str | None = Field(default=None, max_length=40)
+    country_id: str | None = None
+    org_id: str | None = None
+
+
 class AuthenticatedUser(BaseModel):
     id: str
     email: str | None = None

@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     reminder_poll_seconds: int = 60
     session_ttl_seconds: int = 300
     enable_reminder_scheduler: bool = False
+    redis_url: str = ""
+    rate_limit_login: int = 10
+    rate_limit_ai: int = 30
+    rate_limit_api: int = 120
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -48,6 +52,10 @@ class Settings(BaseSettings):
     @property
     def auth_ready(self) -> bool:
         return len(self.app_session_secret) >= 32
+
+    @property
+    def rate_limit_ready(self) -> bool:
+        return bool(self.redis_url) or self.app_env == "development"
 
     @property
     def production_ready(self) -> bool:

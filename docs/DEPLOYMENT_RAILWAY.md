@@ -6,8 +6,10 @@
 2. Use Supabase de staging o una copia sin datos personales.
 3. No apunte Meta al nuevo dominio y mantenga n8n activo.
 4. Aplique `migrations/20261016_agropython_runtime.sql` primero en staging.
-5. No aplique `20261016_rls_target_NOT_FOR_PRODUCTION_YET.sql`: documenta el
-   objetivo futuro y el panel heredado todavía no usa Supabase Auth.
+5. Tras comprobar los endpoints, aplique solamente en staging
+   `migrations/staging/20261016_rls_restrictive_staging.sql`.
+6. Guarde antes un respaldo de solo esquema. El rollback de emergencia está junto
+   al script, aunque restaurar el respaldo reproduce con mayor fidelidad los grants.
 
 ## Variables
 
@@ -22,6 +24,8 @@ Configure en Railway, nunca en Git:
 - `GEMINI_API_KEY`, `GEMINI_MODEL`
 - `ENABLE_REMINDER_SCHEDULER=false` durante la primera validación
 - `REMINDER_POLL_SECONDS=60`
+- `REDIS_URL` desde un servicio Redis privado de Railway
+- `RATE_LIMIT_LOGIN=10`, `RATE_LIMIT_AI=30`, `RATE_LIMIT_API=120`
 
 Railway suministra `PORT`; el comando ya ejecuta Uvicorn con ese puerto. El
 healthcheck es `/health/ready`. Docker usa Linux y el mismo contrato.
@@ -31,6 +35,7 @@ healthcheck es `/health/ready`. Docker usa Linux y el mismo contrato.
 1. Compruebe `/health/live`, `/health/ready`, `/`, `/dashboard.html` y
    `/js/config.js` por HTTPS.
 2. Use una cuenta exclusiva de staging para login y aislamiento entre usuarios.
+   Cree datos ficticios; no clone nombres, teléfonos ni mensajes reales.
 3. Pruebe Gemini autenticado desde `/api/ai/chat`.
 4. Use número y webhook Meta de prueba. Verifique desafío GET, firma POST válida,
    rechazo de firma inválida y reintento del mismo `message_id`.
@@ -38,6 +43,40 @@ healthcheck es `/health/ready`. Docker usa Linux y el mismo contrato.
    marcas de Supabase, reinicio y ausencia de duplicados.
 6. Simule fallos de Meta y compruebe `whatsapp_last_error` y
    `whatsapp_next_attempt_at`.
+7. Ejecute dos instancias y compruebe que Redis limita globalmente y que un reminder
+   solo es reclamado por una instancia.
+
+## Conexiones manuales
+
+### Railway
+
+1. Cree un proyecto y servicio desde `Thorling006/AgroPython`, rama `main`.
+2. Añada PostgreSQL **solo si lo necesita para otras funciones**; Supabase sigue
+   siendo la base principal. Añada Redis y copie su referencia privada a `REDIS_URL`.
+3. Configure las variables anteriores, genere dominio HTTPS y mantenga
+   `ENABLE_REMINDER_SCHEDULER=false`.
+4. Confirme build Docker/Ubuntu, `/health/live` 200 y `/health/ready` 200.
+
+### Supabase staging
+
+1. Cree un proyecto nuevo en la misma región disponible; no restaure datos reales.
+2. Reproduzca solo el esquema base, aplique runtime y luego las RLS de staging.
+3. Cree dos usuarios ficticios con teléfonos no reales reservados para prueba.
+4. Use la anon key solo en `SUPABASE_ANON_KEY` y la service role únicamente en
+   variables privadas de Railway.
+
+### Gemini
+
+1. Cree/restrinja una API key de pruebas y configure `GEMINI_API_KEY` en Railway.
+2. Valide cuota, timeout y respuesta 502 controlada; nunca coloque la clave en JS.
+
+### Meta
+
+1. Use una app o número de prueba y agregue como callback el dominio de staging.
+2. Configure en Railway el Phone Number ID, token, verify token y App Secret de
+   pruebas. No reutilice ni cambie el callback productivo.
+3. Suscriba `messages`, valide el desafío y envíe payloads firmados.
+4. Mantenga n8n productivo activo durante toda esta validación.
 
 ## Corte controlado (requiere autorización)
 

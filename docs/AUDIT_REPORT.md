@@ -1,6 +1,6 @@
 # Auditoría técnica — 16/10/2026
 
-No se usaron credenciales ni datos reales. Evidencia: inspección, 21 pruebas pytest,
+No se usaron credenciales ni datos reales. Evidencia: inspección, 33 pruebas pytest,
 dos smoke tests y compilación de módulos.
 
 | Funcionalidad | Estado | Evidencia | Riesgo | Acción necesaria |
@@ -9,8 +9,9 @@ dos smoke tests y compilación de módulos.
 | Docker/Railway | Implementada | Dockerfile, PORT, railway.json | Medio | Build real Railway |
 | Healthchecks | Probada | live/ready | Bajo | Cargar variables |
 | Login backend | Probada por contrato | JWT y rutas protegidas | Alto | Migrar SHA-256 a Argon2 |
-| Aislamiento | Probada | Token prevalece sobre user_id inyectado | Medio | Migrar resto del panel |
-| RLS Supabase | Pendiente | Acceso directo heredado | Crítico | Supabase Auth + RLS |
+| Aislamiento | Probada | Token prevalece sobre IDs inyectados | Bajo | Validar staging |
+| RLS sensible | Preparada, no aplicada | SQL staging/rollback | Medio | Ejecutar en staging |
+| Rate limiting | Probado con Redis simulado | Límite compartido y 429 | Medio | Redis Railway real |
 | Firma Meta | Probada local | Rechaza firma inválida | Medio | Payload real staging |
 | Statuses Meta | Probada | delivered se ignora | Bajo | Validación real |
 | Duplicados inbound | Implementada | RPC atómica + prueba | Medio | Migración staging |
@@ -22,7 +23,8 @@ dos smoke tests y compilación de módulos.
 | Recordatorios | Probada con dobles | Éxito, fallo y backoff | Medio | Meta real |
 | Idempotencia reminder | Implementada | SKIP LOCKED + claim | Medio | Dos instancias staging |
 | Migraciones | Revisadas | Nueva migración idempotente | Medio | Ejecutar en staging |
-| Panel completo | Parcial | Carga; operaciones legacy directas | Alto | API tabla por tabla |
+| Panel privado núcleo | Migrado | Usuarios, actividades y mensajes por API | Medio | Prueba visual staging |
+| Panel social/cultivos | Parcial | Inventario de accesos directos | Alto | API tabla por tabla |
 | Integraciones reales | Pendiente | No se usaron secretos | Crítico | Corte autorizado |
 
 ## Corregido
@@ -38,8 +40,8 @@ dos smoke tests y compilación de módulos.
 
 ## Bloqueadores para producción pública
 
-1. Aplicar/validar la migración runtime sobre una copia del esquema real.
-2. Migrar el acceso directo del frontend a API/JWT o Supabase Auth y luego RLS.
+1. Aplicar/validar runtime y RLS en un proyecto Supabase de staging sin datos reales.
+2. Migrar cultivos, AgroRed, grupos, comunidades y soporte restantes.
 3. Validar Supabase, Gemini y Meta reales en staging.
 4. Ensayar envío, reintento y reinicio con el número Meta de prueba.
 5. Añadir rate limiting distribuido al login y AI.
