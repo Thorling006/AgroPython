@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporativo - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <style>
+        .hero-corporate {
+            background: linear-gradient(135deg, #1a4d2e 0%, #2d5a27 100%);
+            color: white;
+            padding: 120px 0 80px;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            margin-bottom: 20px;
+        }
+
+        .iso-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            border: 1px solid #f0f0f0;
+            transition: transform 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-soft);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .story-timeline {
+            position: relative;
+            padding-left: 30px;
+            border-left: 2px solid var(--primary-soft);
+        }
+
+        .story-dot {
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            border-radius: 50%;
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <header class="hero-corporate animate-slide-up">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">Tecnología al Servicio del Campo</h1>
+            <p class="lead opacity-75 mx-auto" style="max-width: 700px;">Optimización, sostenibilidad y precisión
+                agrícola mediante ingeniería de software de clase mundial.</p>
+
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <div class="iso-badge shadow-sm">
+                    <i class="bi bi-patch-check-fill fs-2 text-warning"></i>
+                    <div class="text-start">
+                        <div class="small opacity-75 fw-medium">Calidad Garantizada</div>
+                        <div class="fw-bold">ISO 9001:2015</div>
+                    </div>
+                </div>
+                <div class="iso-badge shadow-sm">
+                    <i class="bi bi-shield-fill-check fs-2 text-success"></i>
+                    <div class="text-start">
+                        <div class="small opacity-75 fw-medium">Gestión Ambiental</div>
+                        <div class="fw-bold">ISO 14001:2015</div>
+                    </div>
+                </div>
+                <div class="iso-badge shadow-sm">
+                    <i class="bi bi-lock-fill fs-2 text-info"></i>
+                    <div class="text-start">
+                        <div class="small opacity-75 fw-medium">Seguridad de Datos</div>
+                        <div class="fw-bold">ISO/IEC 27001:2022</div>
+                    </div>
+                </div>
+                <div class="iso-badge shadow-sm">
+                    <i class="bi bi-basket-fill fs-2 text-danger"></i>
+                    <div class="text-start">
+                        <div class="small opacity-75 fw-medium">Inocuidad Alimentaria</div>
+                        <div class="fw-bold">ISO 22000:2018</div>
+                    </div>
+                </div>
+                <div class="iso-badge shadow-sm">
+                    <i class="bi bi-shield-exclamation fs-2 text-primary"></i>
+                    <div class="text-start">
+                        <div class="small opacity-75 fw-medium">Gestión de Riesgos</div>
+                        <div class="fw-bold">ISO 31000:2018</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mb-5 mt-5">
+        <!-- Misión y Visión -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 animate-slide-up animate-delay-1">
+                <div class="section-card">
+                    <div class="icon-circle bg-success-soft text-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path d="M8 13A5 5 0 1 1 8 3a5 5 0 0 1 0 10zm0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12z" />
+                            <path d="M8 11A3 3 0 1 1 8 5a3 3 0 0 1 0 6zm0 1A4 4 0 1 0 8 4a4 4 0 0 0 0 8z" />
+                            <path d="M9.5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="fw-bold mb-3">Misión</h3>
+                    <p class="text-muted leading-relaxed text-break">
+                        Proveer herramientas tecnológicas innovadoras y accesibles que permitan a los agricultores tomar
+                        decisiones basadas en datos reales, optimizando el uso de recursos y garantizando la seguridad
+                        alimentaria mediante la digitalización del campo.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 animate-slide-up animate-delay-2">
+                <div class="section-card">
+                    <div class="icon-circle bg-primary-soft text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                            <path
+                                d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="fw-bold mb-3">Visión</h3>
+                    <p class="text-muted leading-relaxed text-break">
+                        Ser la plataforma líder en gestión agrícola a nivel latinoamericano para el año 2030, reconocida
+                        por nuestra capacidad de integrar inteligencia artificial y análisis climático para transformar
+                        pequeñas parcelas en agro-empresas altamente eficientes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Origen de la Idea -->
+        <div class="agro-card p-5 mb-5 animate-slide-up animate-delay-3">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h2 class="fw-bold text-success mb-4">📍 ¿De dónde surgió la idea?</h2>
+                    <div class="story-timeline">
+                        <div class="story-dot"></div>
+                        <p class="text-muted">
+                            AgroSmart nació de la observación directa de las dificultades que enfrentan los agricultores
+                            locales: la incertidumbre climática y el desconocimiento de los tiempos técnicos de
+                            fertilización. <br><br>
+                            Nuestro equipo, compuesto por ingenieros comprometidos con la sostenibilidad, decidió crear
+                            un puente entre la ciencia agrícola y la tecnología móvil, permitiendo que cualquier
+                            productor, independientemente de su tamaño, tenga acceso a una ficha técnica automatizada y
+                            un guía digital en su bolsillo.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                    <div class="p-4 bg-light rounded-4">
+                        <h4 class="fw-bold mb-3">Nuestra Cultura</h4>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <span class="badge bg-white text-dark border p-2 px-3 rounded-pill shadow-xs">🌱
+                                Integridad</span>
+                            <span class="badge bg-white text-dark border p-2 px-3 rounded-pill shadow-xs">🚀
+                                Innovación</span>
+                            <span class="badge bg-white text-dark border p-2 px-3 rounded-pill shadow-xs">🤝 Empatía
+                                Agrícola</span>
+                            <span class="badge bg-white text-dark border p-2 px-3 rounded-pill shadow-xs">📊
+                                Precisión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Objetivos -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4 animate-slide-up animate-delay-1">
+                <div class="section-card">
+                    <h4 class="fw-bold mb-4">Objetivo General</h4>
+                    <p class="text-muted small">
+                        Desarrollar un ecosistema digital integral que centralice el monitoreo, planificación y gestión
+                        de cultivos para maximizar la productividad agrícola reduciendo el impacto ambiental.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="section-card">
+                    <h4 class="fw-bold mb-4">Objetivos Específicos</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex gap-3 mb-3">
+                                <i class="bi bi-clock-history text-success fs-5"></i>
+                                <span class="small text-muted">Automatizar los calendarios de abonado según
+                                    requerimientos biológicos.</span>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <i class="bi bi-cloud-sun text-primary fs-5"></i>
+                                <span class="small text-muted">Integrar análisis meteorológico en tiempo real para la
+                                    toma de decisiones.</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex gap-3 mb-3">
+                                <i class="bi bi-map text-warning fs-5"></i>
+                                <span class="small text-muted">Facilitar la geolocalización de parcelas para un control
+                                    logístico eficiente.</span>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <i class="bi bi-graph-up-arrow text-danger fs-5"></i>
+                                <span class="small text-muted">Proporcionar reportes históricos que permitan mejorar las
+                                    cosechas futuras.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seguridad y Estándares -->
+        <div id="visitor-guide-section" class="row g-4 mb-5 animate-slide-up animate-delay-4">
+            <div class="col-12">
+                <div class="section-card border-success border-opacity-25"
+                    style="border-left: 5px solid var(--primary-color);">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="fw-bold mb-4">📖 Guía Rápida de Usuario</h2>
+                            <p class="text-muted mb-4">Aprende a sacar el máximo provecho de AgroSmart en pocos pasos:
+                            </p>
+                            <div class="row g-4">
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">1. Registro de Cultivo</h6>
+                                    <p class="small text-muted">Usa el botón "Registrar" para añadir tu parcela.
+                                        Selecciona un cultivo del catálogo para obtener parámetros técnicos automáticos.
+                                    </p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">2. Monitoreo en el Mapa</h6>
+                                    <p class="small text-muted">Desde el Dashboard, visualiza tus cultivos en el mapa 3D
+                                        y consulta el clima local en tiempo real.</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">3. Plan de Abonado</h6>
+                                    <p class="small text-muted">Entra a los detalles de tu cultivo para ver el historial
+                                        y las próximas aplicaciones de fertilizante programadas.</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">4. Consultas y Chat</h6>
+                                    <p class="small text-muted">¿Tienes dudas? Usa el sistema de chat para comunicarte
+                                        con los administradores del ministerio o tu cooperativa.</p>
+                                </div>
+                                <div class="col-sm-12 mt-2">
+                                    <div class="p-3 rounded-4 border border-info bg-dark text-white shadow-sm">
+                                        <h6 class="fw-bold text-info"><i class="bi bi-cpu-fill me-2"></i>5. IA Madre & OpenAI Códice (Codex)</h6>
+                                        <p class="small text-white-50 mb-0">
+                                            Toda nuestra plataforma y las consultas de esta Guía Principal están impulsadas por <strong>OpenAI Códice (Codex - Créditos $100 USD)</strong> y la <strong>API de OpenAI GPT-4o ($50 USD Créditos)</strong> utilizando nuestra membresía oficial Pro. Jarvis habla con síntesis neural ultra humana de <strong>ElevenLabs AI</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mt-4 mt-md-0">
+                            <div class="p-4 bg-light rounded-4 border">
+                                <h5 class="fw-bold mb-3">¿Listo para empezar?</h5>
+                                <a href="index.html" class="btn btn-agro-primary w-100 mb-2">Crear mi Cuenta</a>
+                                <a href="manual_usuario.html" class="btn btn-outline-success w-100 fw-bold"><i
+                                        class="bi bi-book me-1"></i> Ver Manual Completo</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mb-5 animate-slide-up animate-delay-2">
+            <h2 class="fw-bold mb-5">Nuestra Identidad: El Equipo Humano</h2>
+            <div class="row g-4 justify-content-center">
+                <!-- Miembros actualizados del equipo -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <img src="img/Carranza.JPG" class="team-avatar"
+                        onerror="this.src='https://ui-avatars.com/api/?name=Bryan+Carranza&background=1a4d2e&color=fff'">
+                    <h6 class="fw-bold m-0">Brayan Isaac Carranza Amaya</h6>
+                    <p class="small text-muted">Gestor Backend</p>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <img src="img/Nefta.JPG" class="team-avatar"
+                        onerror="this.src='https://ui-avatars.com/api/?name=Neftaly+Fuentes&background=1a4d2e&color=fff'">
+                    <h6 class="fw-bold m-0"> Jeremias Neftaly Fuentes Mendez</h6>
+                    <p class="small text-muted">Espec. Infraestructura</p>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <img src="img/Toño.JPG" class="team-avatar"
+                        onerror="this.src='https://ui-avatars.com/api/?name=Kevin+Antonio&background=1a4d2e&color=fff'">
+                    <h6 class="fw-bold m-0">Kevin Antonio Castro Araujo</h6>
+                    <p class="small text-muted">Integrador Full Stack</p>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <img src="img/Omar.JPG" class="team-avatar"
+                        onerror="this.src='https://ui-avatars.com/api/?name=Omar+David&background=1a4d2e&color=fff'">
+                    <h6 class="fw-bold m-0">Omar David Ventura Cruz</h6>
+                    <p class="small text-muted">Backend Specialist</p>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <img src="img/Adaly.JPG" class="team-avatar"
+                        onerror="this.src='https://ui-avatars.com/api/?name=Adaly+Campos&background=1a4d2e&color=fff'">
+                    <h6 class="fw-bold m-0">Brayan Adaly Campos Martinez</h6>
+                    <p class="small text-muted">Frontend Dev</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-light py-4 border-top">
+        <div class="container text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-2 small">
+                <a href="index.html" class="text-muted text-decoration-none">Inicio</a> &bull;
+                <a href="privacy.html" class="text-muted text-decoration-none">Política de Privacidad</a> &bull;
+                <a href="data-deletion.html" class="text-muted text-decoration-none">Eliminación de Datos</a> &bull;
+                <a href="terms.html" class="text-muted text-decoration-none">Términos de Servicio</a> &bull;
+                <a href="soporte.html" class="text-muted text-decoration-none">Soporte</a>
+            </div>
+            <p class="text-muted small m-0">&copy; 2026 AgroSmart - El Futuro del Campo. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.initLayout) window.initLayout('about');
+        });
+    </script>
+</body>
+
+</html>

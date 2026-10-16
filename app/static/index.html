@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSmart - Login</title>
+    <link rel="stylesheet" href="css/modern_agro.css">
+</head>
+<body class="auth-body-split">
+    <div class="auth-split-layout">
+        
+        <!-- SIDE IMAGE FOR DESKTOP -->
+        <div class="auth-image-side animate__animated animate__fadeIn">
+            <div class="auth-image-overlay animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="mb-3">
+                    <span class="badge rounded-pill bg-success px-3 py-2 text-uppercase fw-bold text-white" style="color: #ffffff !important;">Plataforma AgroSmart</span>
+                </div>
+                <h1 class="display-4 fw-800 text-white mb-3" style="color: #ffffff !important; text-shadow: 0 4px 15px rgba(0,0,0,0.8);">Tu Campo, Conectado.</h1>
+                <p class="lead text-white opacity-100 m-0" style="color: #ffffff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Gestión inteligente de cultivos, monitoreo satelital en 3D y nutrición vegetal predictiva.</p>
+            </div>
+        </div>
+
+        <!-- FORM SIDE -->
+        <div class="auth-form-side">
+            <div class="auth-container w-100">
+                
+                <!-- LOGIN VIEW -->
+                <div id="login-view" class="auth-card view-section active">
+                    <div class="text-center mb-4">
+                        <div class="icon-circle bg-success-soft text-success mx-auto mb-3" style="width: 50px; height: 50px; font-size: 24px;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1">Iniciar Sesión</h1>
+                        <p class="text-muted small">Accede a tu panel de control agrícola</p>
+                    </div>
+                    <div id="login-error" class="auth-error"></div>
+                    <form id="login-form">
+                        <div class="auth-form-group">
+                            <label for="login-email">Correo Electrónico</label>
+                            <input type="email" id="login-email" class="form-control" required autofocus placeholder="ejemplo@gmail.com">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="login-password">Contraseña</label>
+                            <input type="password" id="login-password" class="form-control" required placeholder="Tu contraseña">
+                        </div>
+                        <button type="submit" class="btn-auth w-100 py-3 mt-2">Ingresar a AgroSmart</button>
+                    </form>
+                    <div class="auth-footer mt-4">
+                        <p class="mb-2">¿No tienes cuenta? <a onclick="switchView('register-view')" class="text-primary fw-bold">Regístrate aquí</a></p>
+                        <a onclick="switchView('recover-view')" class="text-muted small d-block mb-4">¿Olvidaste tu contraseña?</a>
+                        <hr class="my-4" style="border-color: rgba(0,0,0,0.1);">
+                        <a href="dashboard.html" class="btn btn-agro-outline w-100 py-2">
+                            <i class="bi bi-compass me-2"></i>Explorar como Visitante
+                        </a>
+                    </div>
+                </div>
+
+                <!-- REGISTER VIEW (WhatsApp-First) -->
+                <div id="register-view" class="auth-card view-section">
+                    <div class="text-center mb-4">
+                        <div class="icon-circle bg-primary-soft text-primary mx-auto mb-3" style="width: 50px; height: 50px; font-size: 24px;">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1">Crear Cuenta</h1>
+                        <p class="text-muted small">Únete a la revolución agrícola</p>
+                    </div>
+                    <div id="register-error" class="auth-error"></div>
+                    <div class="auth-info small">
+                        Completa tus datos para crear tu cuenta. Tu número de WhatsApp será tu canal principal de comunicación.
+                    </div>
+                    <form id="register-form">
+                        <div class="auth-form-group">
+                            <label for="register-email">Correo Electrónico</label>
+                            <input type="email" id="register-email" class="form-control" required placeholder="ejemplo@gmail.com">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="register-country">País de Residencia</label>
+                            <select id="register-country" class="form-select auth-select" required>
+                                <option value="">Selecciona tu país...</option>
+                            </select>
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="register-phone"><i class="bi bi-whatsapp text-success me-1"></i>Número de Teléfono</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select id="register-phone-code" class="form-select auth-select" style="width: 140px; flex-shrink: 0;" required>
+                                    <!-- Populated by JS from CONFIG.PHONE_COUNTRY_CODES -->
+                                </select>
+                                <input type="tel" id="register-phone" class="form-control" required placeholder="7123 4567" pattern="[0-9]{7,15}" title="Solo números, mínimo 7 dígitos">
+                            </div>
+                            <small id="phone-format-hint" class="text-muted" style="font-size: 0.75rem; margin-top: 4px; display: block;">Formato: solo números sin guiones ni espacios</small>
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="register-password">Contraseña (Mínimo 6 caracteres)</label>
+                            <input type="password" id="register-password" class="form-control" required placeholder="••••••••" minlength="6">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="register-password-confirm">Confirmar Contraseña</label>
+                            <input type="password" id="register-password-confirm" class="form-control" required placeholder="••••••••" minlength="6">
+                        </div>
+                        <div class="auth-form-group" style="margin-top: 12px;">
+                            <label class="d-flex align-items-start gap-3" style="cursor: pointer; font-weight: 500; text-transform: none; letter-spacing: 0;">
+                                <input type="checkbox" id="register-whatsapp-optin" checked style="width: 20px; height: 20px; margin-top: 2px; accent-color: #25D366; flex-shrink: 0;">
+                                <span style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4;">
+                                    <i class="bi bi-whatsapp text-success"></i>
+                                    Acepto recibir recordatorios de mis cultivos por <strong>WhatsApp</strong>
+                                </span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-auth w-100 py-3 mt-2">
+                            <i class="bi bi-check-circle me-2"></i>Crear Mi Cuenta
+                        </button>
+                    </form>
+                    <div class="auth-footer mt-4">
+                        ¿Ya eres miembro? <a onclick="switchView('login-view')" class="text-primary fw-bold">Inicia sesión</a>
+                    </div>
+                </div>
+
+                <!-- RECOVER VIEW -->
+                <div id="recover-view" class="auth-card view-section">
+                    <div class="text-center mb-4">
+                        <div class="icon-circle bg-warning-soft text-warning mx-auto mb-3" style="width: 50px; height: 50px; font-size: 24px;">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1">Recuperar Acceso</h1>
+                        <p class="text-muted small">Restablece tu contraseña</p>
+                    </div>
+                    <div id="recover-error" class="auth-error"></div>
+                    <div class="auth-info small">
+                        Ingresa tu email registrado y te enviaremos un código para restablecer tu cuenta.
+                    </div>
+                    <form id="recover-form">
+                        <div class="auth-form-group">
+                            <label for="recover-email">Correo Electrónico</label>
+                            <input type="email" id="recover-email" class="form-control" required placeholder="ejemplo@gmail.com">
+                        </div>
+                        <button type="submit" class="btn-auth w-100 py-3 mt-2">Enviar Código</button>
+                    </form>
+                    <div class="auth-footer mt-4">
+                        <a onclick="switchView('login-view')" class="text-muted"><i class="bi bi-arrow-left me-1"></i>Volver al inicio</a>
+                    </div>
+                </div>
+
+                <!-- OTP VIEW -->
+                <div id="otp-view" class="auth-card view-section">
+                    <div class="text-center mb-4">
+                        <div class="icon-circle bg-info-soft text-info mx-auto mb-3" style="width: 50px; height: 50px; font-size: 24px; background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+                            <i class="bi bi-envelope-check-fill"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1">Verificar Correo</h1>
+                        <p class="text-muted small">Código de seguridad requerido</p>
+                    </div>
+                    <div id="otp-error" class="auth-error"></div>
+                    <div id="otp-success" class="auth-success">Código enviado (Simulado: revisa las alertas del navegador)</div>
+                    <div class="auth-info small">
+                        Enviamos un código de 6 dígitos a <br><strong id="display-otp-email" class="text-dark"></strong>
+                    </div>
+                    <form id="otp-form">
+                        <div class="auth-form-group">
+                            <label for="otp-code">Código de Verificación</label>
+                            <input type="text" id="otp-code" class="form-control text-center fs-4 letter-spacing-2" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 0.5em;">
+                        </div>
+                        <button type="submit" class="btn-auth w-100 py-3 mt-2">Verificar Código</button>
+                    </form>
+                    <div class="auth-footer mt-4">
+                        <a onclick="switchView('register-view')" class="text-muted small">Cambiar correo electrónico</a>
+                    </div>
+                </div>
+
+                <!-- PASSWORD CREATE VIEW -->
+                <div id="create-password-view" class="auth-card view-section">
+                    <div class="text-center mb-4">
+                        <div class="icon-circle bg-success-soft text-success mx-auto mb-3" style="width: 50px; height: 50px; font-size: 24px;">
+                            <i class="bi bi-key-fill"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1">Nueva Contraseña</h1>
+                        <p class="text-muted small">Asegura tu cuenta</p>
+                    </div>
+                    <div id="create-pwd-error" class="auth-error"></div>
+                    <form id="create-password-form">
+                        <div class="auth-form-group">
+                            <label for="new-password">Contraseña (Mínimo 6 caracteres)</label>
+                            <input type="password" id="new-password" class="form-control" required placeholder="••••••••" minlength="6">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="confirm-password">Confirmar Contraseña</label>
+                            <input type="password" id="confirm-password" class="form-control" required placeholder="••••••••" minlength="6">
+                        </div>
+                        <button type="submit" class="btn-auth w-100 py-3 mt-2">Guardar Contraseña</button>
+                    </form>
+                </div>
+
+                <!-- LEGAL & PRIVACY FOOTER -->
+                <div class="text-center mt-4 pt-3 border-top" style="border-color: rgba(0,0,0,0.08) !important; font-size: 0.75rem;">
+                    <a href="privacy.html" class="text-muted text-decoration-none mx-2">Política de Privacidad</a> &bull;
+                    <a href="data-deletion.html" class="text-muted text-decoration-none mx-2">Eliminación de Datos</a> &bull;
+                    <a href="terms.html" class="text-muted text-decoration-none mx-2">Términos de Servicio</a>
+                    <div class="text-muted opacity-75 mt-1" style="font-size: 0.7rem;">&copy; 2026 AgroSmart Corporation</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- EmailJS SDK (Fallback only) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <!-- DB, Config, and Services -->
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/notification-service.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

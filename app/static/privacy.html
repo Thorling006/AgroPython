@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad - AgroSmart Corporation</title>
+    <meta name="description" content="Política de Privacidad oficial de AgroSmart Corporation para usuarios, servicios web y comunicaciones mediante WhatsApp Business Platform y WhatsApp Cloud API.">
+    <meta name="robots" content="index, follow">
+
+    <!-- CSS & Frameworks -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="css/modern_agro.css">
+
+    <style>
+        .hero-legal {
+            background: linear-gradient(135deg, #047857 0%, #065f46 50%, #022c22 100%);
+            color: white;
+            padding: 85px 0 55px;
+            border-bottom-left-radius: 36px;
+            border-bottom-right-radius: 36px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(4, 120, 87, 0.25);
+        }
+
+        .hero-legal::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .legal-sidebar {
+            position: sticky;
+            top: 25px;
+            max-height: calc(100vh - 50px);
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 24px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+
+        .legal-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .legal-sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color, #10b981);
+            border-radius: 10px;
+        }
+
+        .nav-link-legal {
+            color: #4b5563;
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-bottom: 4px;
+        }
+
+        .nav-link-legal:hover,
+        .nav-link-legal.active {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            transform: translateX(3px);
+        }
+
+        .legal-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 35px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.03);
+            margin-bottom: 30px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .legal-card:hover {
+            box-shadow: 0 18px 40px rgba(16, 185, 129, 0.08);
+        }
+
+        .legal-section-title {
+            font-weight: 800;
+            color: #111827;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.25);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.35rem;
+        }
+
+        .legal-section-title i {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.12);
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+
+        .highlight-box {
+            background: rgba(16, 185, 129, 0.06);
+            border-left: 4px solid #10b981;
+            padding: 16px 20px;
+            border-radius: 0 16px 16px 0;
+            margin: 18px 0;
+        }
+
+        .placeholder-tag {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: monospace;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-meta-status {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-navbar-public {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        @media (max-width: 991px) {
+            .legal-sidebar {
+                position: relative;
+                top: 0;
+                max-height: none;
+                margin-bottom: 25px;
+            }
+
+            .legal-card {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-body">
+
+    <!-- Top Public Navigation Bar -->
+    <nav class="top-navbar-public py-3">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand text-decoration-none d-flex align-items-center gap-2" href="index.html">
+                <img src="img/logo.png" alt="AgroSmart Logo" style="height: 38px; width: auto; object-fit: contain;"
+                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Agro+Smart&background=10b981&color=fff';">
+                <span style="color: #111827; font-weight: 900; font-size: 1.3rem; letter-spacing: -0.5px;">AgroSmart</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="index.html" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold d-none d-sm-inline-flex align-items-center gap-1">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a href="data-deletion.html" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-dark">
+                    Eliminación de Datos
+                </a>
+                <a href="terms.html" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-dark d-none d-md-inline-flex">
+                    Términos de Servicio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Hero Section -->
+    <header class="hero-legal text-center animate__animated animate__fadeIn">
+        <div class="container position-relative z-1">
+            <div class="mb-3">
+                <span class="badge-meta-status">
+                    <i class="bi bi-shield-check text-warning fs-6"></i>
+                    Cumplimiento de Privacidad y Plataforma
+                </span>
+            </div>
+            <h1 class="display-5 fw-bold mb-2">Política de Privacidad</h1>
+            <p class="lead opacity-90 mx-auto mb-3" style="max-width: 780px;">
+                Transparencia sobre el tratamiento, seguridad y protección de datos en los servicios web y comunicaciones mediante WhatsApp de AgroSmart Corporation.
+            </p>
+            <div class="small opacity-75 d-inline-flex align-items-center gap-2 bg-dark bg-opacity-25 px-3 py-1 rounded-pill">
+                <i class="bi bi-calendar-check"></i>
+                <span>Última actualización: <strong>12 de agosto de 2026</strong></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container my-5">
+        <div class="row g-4">
+
+            <!-- Sidebar Navigation / Table of Contents -->
+            <div class="col-lg-3">
+                <nav class="legal-sidebar">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3 px-2" style="letter-spacing: 0.5px;">
+                        Índice del Documento
+                    </h6>
+                    <a href="#sec-identidad" class="nav-link-legal active"><i class="bi bi-building"></i> 1. Identidad y Alcance</a>
+                    <a href="#sec-whatsapp" class="nav-link-legal"><i class="bi bi-whatsapp"></i> 2. Canal WhatsApp</a>
+                    <a href="#sec-datos" class="nav-link-legal"><i class="bi bi-collection"></i> 3. Datos que Recopilamos</a>
+                    <a href="#sec-finalidades" class="nav-link-legal"><i class="bi bi-bullseye"></i> 4. Finalidades del Uso</a>
+                    <a href="#sec-proveedores" class="nav-link-legal"><i class="bi bi-hdd-network"></i> 5. Proveedores y Terceros</a>
+                    <a href="#sec-no-venta" class="nav-link-legal"><i class="bi bi-shield-x"></i> 6. No Venta de Datos</a>
+                    <a href="#sec-seguridad" class="nav-link-legal"><i class="bi bi-lock"></i> 7. Seguridad y Retención</a>
+                    <a href="#sec-derechos" class="nav-link-legal"><i class="bi bi-person-check"></i> 8. Derechos del Usuario</a>
+                    <a href="#sec-eliminacion" class="nav-link-legal"><i class="bi bi-trash"></i> 9. Solicitud de Eliminación</a>
+                    <a href="#sec-cambios" class="nav-link-legal"><i class="bi bi-journal-text"></i> 10. Cambios a la Política</a>
+                    <a href="#sec-contacto" class="nav-link-legal"><i class="bi bi-envelope"></i> 11. Información de Contacto</a>
+
+                    <hr class="my-3 border-secondary opacity-25">
+
+                    <div class="p-3 bg-light rounded-3 border small">
+                        <div class="fw-bold text-dark mb-1"><i class="bi bi-info-circle text-success me-1"></i> Páginas Relacionadas</div>
+                        <ul class="list-unstyled m-0 ps-1" style="font-size: 0.85rem;">
+                            <li class="mb-1"><a href="data-deletion.html" class="text-decoration-none text-success fw-semibold">&rsaquo; Eliminación de Datos</a></li>
+                            <li class="mb-1"><a href="terms.html" class="text-decoration-none text-success fw-semibold">&rsaquo; Términos de Servicio</a></li>
+                            <li><a href="soporte.html" class="text-decoration-none text-success fw-semibold">&rsaquo; Centro de Soporte</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-lg-9">
+
+                <!-- 1. Identidad y Alcance -->
+                <section id="sec-identidad" class="legal-card animate__animated animate__fadeIn">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-building"></i> 1. Identidad de AgroSmart Corporation y Alcance
+                    </h2>
+                    <p>
+                        <strong>AgroSmart Corporation</strong> («AgroSmart», «nosotros», «nuestro») es una plataforma tecnológica orientada al sector agrícola que ofrece herramientas de software para la gestión de cultivos, recordatorios agronómicos, monitoreo meteorológico y asistencia técnica.
+                    </p>
+                    <p>
+                        Esta Política de Privacidad describe de forma clara, transparente y detallada cómo recopilamos, utilizamos, almacenamos y protegemos la información personal de los usuarios que interactúan con nosotros a través de nuestro sitio web y de nuestros canales de mensajería empresarial en <strong>WhatsApp</strong>.
+                    </p>
+                    <div class="highlight-box">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                        <strong>Ámbito de aplicación:</strong> Este documento rige tanto para los visitantes del sitio web público como para los usuarios que se comunican o reciben notificaciones automatizadas a través de la integración de <strong>WhatsApp Business Platform / WhatsApp Cloud API</strong>.
+                    </div>
+                </section>
+
+                <!-- 2. Comunicaciones mediante WhatsApp -->
+                <section id="sec-whatsapp" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-whatsapp"></i> 2. Comunicaciones mediante WhatsApp
+                    </h2>
+                    <p>
+                        AgroSmart Corporation pone a disposición de sus usuarios la opción de interactuar mediante mensajería de WhatsApp para recibir asistencia, coordinar actividades agronómicas y gestionar alertas programadas de sus parcelas y cultivos.
+                    </p>
+                    <p>
+                        La comunicación a través de este canal es <strong>estrictamente voluntaria</strong>. El usuario puede iniciar conversaciones directamente con nuestro número comercial o aceptar recibir recordatorios operativos mediante un consentimiento previo (opt-in) al registrarse o configurar su cuenta.
+                    </p>
+                    <ul>
+                        <li><strong>Mensajes Transaccionales y Operativos:</strong> Notificaciones sobre actividades programadas (ej. fechas de riego, fertilización o cosecha).</li>
+                        <li><strong>Respuestas Interactivas:</strong> Confirmación del estado de actividades mediante botones de respuesta rápida (ej. «Ya realizado», «Recordarme más tarde», «Reprogramar»).</li>
+                        <li><strong>Atención y Soporte:</strong> Recepción y atención de consultas técnicas enviadas por el usuario.</li>
+                    </ul>
+                </section>
+
+                <!-- 3. Información que Recopilamos y Procesamos -->
+                <section id="sec-datos" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-collection"></i> 3. Información que Recopilamos y Procesamos
+                    </h2>
+                    <p>
+                        Cuando una persona se comunica con AgroSmart o interactúa con nuestras herramientas a través de WhatsApp o del portal web, procesamos únicamente la información necesaria para brindar el servicio:
+                    </p>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-telephone text-success me-2"></i>Número de Teléfono</h6>
+                                <p class="small text-muted m-0">El número telefónico asociado a la cuenta de WhatsApp desde la cual el usuario envía mensajes o solicita recibir alertas.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-person-badge text-success me-2"></i>Nombre de Perfil</h6>
+                                <p class="small text-muted m-0">El nombre visible o identificador público proporcionado por la plataforma de WhatsApp en los metadatos del mensaje.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-chat-left-text text-success me-2"></i>Contenido de los Mensajes</h6>
+                                <p class="small text-muted m-0">El texto, respuestas interactivas a botones o consultas que el usuario envía de forma deliberada en la conversación.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-clock-history text-success me-2"></i>Marcas de Tiempo y Metadatos</h6>
+                                <p class="small text-muted m-0">Fecha, hora, identificadores de mensaje de Meta (Message IDs) y estado de entrega indispensables para enrutar el flujo de comunicación.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Finalidades del Tratamiento -->
+                <section id="sec-finalidades" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-bullseye"></i> 4. Finalidades del Tratamiento de Datos
+                    </h2>
+                    <p>
+                        La información recopilada se utiliza exclusivamente para los siguientes propósitos legítimos y operativos:
+                    </p>
+                    <ol class="ps-3 mb-0">
+                        <li class="mb-2"><strong>Responder consultas:</strong> Atender preguntas, requerimientos de asistencia y dudas enviadas por el usuario.</li>
+                        <li class="mb-2"><strong>Atención al cliente y soporte técnico:</strong> Brindar acompañamiento en el uso del software y diagnóstico de incidentes.</li>
+                        <li class="mb-2"><strong>Procesamiento de actividades agrícolas:</strong> Registrar las confirmaciones enviadas por el productor sobre sus parcelas (ej. marcar tareas como completadas en su panel de control).</li>
+                        <li class="mb-2"><strong>Automatización de procesos:</strong> Enviar recordatorios programados en base al calendario agronómico definido en la cuenta del usuario.</li>
+                        <li class="mb-2"><strong>Mantenimiento y mejora del servicio:</strong> Analizar la estabilidad técnica de las integraciones para prevenir fallas y optimizar los tiempos de respuesta.</li>
+                    </ol>
+                </section>
+
+                <!-- 5. Proveedores Tecnológicos y Plataformas de Terceros -->
+                <section id="sec-proveedores" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-hdd-network"></i> 5. Proveedores Tecnológicos e Infraestructura de Terceros
+                    </h2>
+                    <p>
+                        Para operar sus servicios y procesar las comunicaciones en tiempo real, AgroSmart Corporation se apoya en proveedores tecnológicos especializados que actúan bajo estrictas medidas de seguridad:
+                    </p>
+                    <ul>
+                        <li class="mb-2">
+                            <strong>Meta Platforms, Inc. / WhatsApp Business Platform:</strong> Proveedor de la infraestructura de mensajería y de la API oficial (WhatsApp Cloud API / Graph API) para la transmisión segura de mensajes entre los usuarios y la cuenta comercial de AgroSmart.
+                        </li>
+                        <li class="mb-2">
+                            <strong>n8n:</strong> Plataforma de automatización de flujos de trabajo utilizada para recibir webhooks de Meta y enrutar las respuestas de los recordatorios hacia nuestros sistemas internos.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Supabase Inc.:</strong> Proveedor de base de datos en la nube con infraestructura cifrada para el almacenamiento de registros de cuentas y estados de actividades agronómicas.
+                        </li>
+                    </ul>
+                    <p class="small text-muted m-0">
+                        Estos proveedores únicamente procesan información de acuerdo con las instrucciones necesarias para la prestación técnica del servicio y cuentan con sus propias políticas de privacidad y seguridad.
+                    </p>
+                </section>
+
+                <!-- 6. Declaración de No Venta de Datos -->
+                <section id="sec-no-venta" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-shield-x"></i> 6. Compromiso de No Venta de Datos
+                    </h2>
+                    <div class="alert alert-success d-flex align-items-center gap-3 p-3 rounded-4 mb-3">
+                        <i class="bi bi-shield-fill-check fs-2 text-success"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">AgroSmart Corporation NO vende datos personales</h6>
+                            <p class="small m-0">No vendemos, no alquilamos, no comercializamos ni transferimos su número de teléfono, historial de mensajes ni información personal a terceros con fines publicitarios o lucrativos.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. Seguridad y Conservación -->
+                <section id="sec-seguridad" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-lock"></i> 7. Seguridad y Conservación de la Información
+                    </h2>
+                    <p>
+                        Implementamos medidas de seguridad técnicas y organizativas para proteger la información contra accesos no autorizados, alteración, pérdida o divulgación:
+                    </p>
+                    <ul>
+                        <li><strong>Cifrado en tránsito:</strong> Toda comunicación entre nuestro sitio web, los webhooks de n8n y la API de Meta se transmite a través de conexiones cifradas mediante protocolo HTTPS/TLS.</li>
+                        <li><strong>Control de acceso:</strong> El acceso a los paneles administrativos y bases de datos está restringido mediante credenciales seguras y autenticación controlada.</li>
+                        <li><strong>Plazo de conservación:</strong> Los datos se conservan únicamente durante el tiempo que sea necesario para cumplir con las finalidades descritas en esta política, mientras el usuario mantenga activa su cuenta o mientras existan obligaciones operativas o legales legítimas.</li>
+                    </ul>
+                </section>
+
+                <!-- 8. Derechos del Usuario -->
+                <section id="sec-derechos" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-person-check"></i> 8. Derechos del Titular de los Datos
+                    </h2>
+                    <p>
+                        Como titular de sus datos personales, usted cuenta con los siguientes derechos fundamentales:
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <span class="fw-bold text-dark d-block mb-1">&bull; Derecho de Acceso</span>
+                                <span class="small text-muted">Solicitar información sobre los datos que conservamos sobre usted.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <span class="fw-bold text-dark d-block mb-1">&bull; Derecho de Rectificación</span>
+                                <span class="small text-muted">Solicitar la actualización o corrección de datos inexactos o incompletos.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <span class="fw-bold text-dark d-block mb-1">&bull; Derecho de Supresión / Eliminación</span>
+                                <span class="small text-muted">Solicitar el borrado de sus datos de nuestras bases de datos y listas de mensajería.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <span class="fw-bold text-dark d-block mb-1">&bull; Derecho de Oposición y Revocación</span>
+                                <span class="small text-muted">Revocar su consentimiento para recibir recordatorios por WhatsApp en cualquier momento.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. Procedimiento para Solicitar Eliminación -->
+                <section id="sec-eliminacion" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-trash"></i> 9. Cómo Solicitar la Eliminación de Datos
+                    </h2>
+                    <p>
+                        Si desea que eliminemos su información de contacto, número de teléfono, historial de mensajes o registro completo de usuario, ponemos a su disposición una guía paso a paso con las instrucciones detalladas requeridas por la plataforma de Meta:
+                    </p>
+                    <div class="p-4 rounded-4 bg-light border text-center my-3">
+                        <i class="bi bi-file-earmark-lock fs-1 text-success mb-2 d-block"></i>
+                        <h5 class="fw-bold mb-2">Instrucciones Oficiales de Eliminación de Datos</h5>
+                        <p class="small text-muted mx-auto mb-3" style="max-width: 550px;">
+                            Consulte el procedimiento completo para solicitar el borrado de datos de WhatsApp y registros de cuenta de AgroSmart Corporation.
+                        </p>
+                        <a href="data-deletion.html" class="btn btn-agro-primary px-4 py-2 rounded-pill fw-bold text-white">
+                            <i class="bi bi-arrow-right-circle me-1"></i> Ver Página de Eliminación de Datos
+                        </a>
+                    </div>
+                </section>
+
+                <!-- 10. Cambios a la Política -->
+                <section id="sec-cambios" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-journal-text"></i> 10. Modificaciones a esta Política
+                    </h2>
+                    <p>
+                        AgroSmart Corporation se reserva el derecho de actualizar esta Política de Privacidad para reflejar mejoras en la plataforma, nuevas funcionalidades en la integración con WhatsApp o cambios en los requisitos normativos y de plataformas asociadas.
+                    </p>
+                    <p class="m-0">
+                        Cualquier modificación será publicada en esta misma página con la fecha de última actualización visible en la parte superior. Le recomendamos revisar este documento periódicamente.
+                    </p>
+                </section>
+
+                <!-- 11. Información de Contacto -->
+                <section id="sec-contacto" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-envelope"></i> 11. Información de Contacto
+                    </h2>
+                    <p>
+                        Si tiene preguntas, dudas o desea ejercer sus derechos de privacidad sobre el tratamiento de sus datos personales, puede ponerse en contacto con el equipo de AgroSmart Corporation a través de los siguientes canales oficiales:
+                    </p>
+                    <div class="p-3 border rounded-3 bg-light mb-3">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-envelope-at fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Correo Electrónico de Privacidad y Soporte:</div>
+                                <div><span class="placeholder-tag">[contacto@agrosmart.com]</span></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-whatsapp fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Canal Oficial de WhatsApp:</div>
+                                <div><span class="placeholder-tag">[+503 0000-0000 / Número Oficial AgroSmart]</span></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-globe fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Sitio Web Oficial:</div>
+                                <div><a href="index.html" class="text-success text-decoration-none fw-semibold">https://atlasdigitalsv-max.github.io/AgroSmart-Corporation/</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="small text-muted m-0">
+                        Responderemos a sus solicitudes de privacidad en el menor tiempo posible y dentro de los plazos razonables conforme a las mejores prácticas de atención.
+                    </p>
+                </section>
+
+                <!-- Back to top & return button -->
+                <div class="text-center my-4">
+                    <a href="index.html" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold me-2">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al Portal Principal
+                    </a>
+                    <a href="#sec-identidad" class="btn btn-light border rounded-pill px-4 py-2 fw-semibold text-muted">
+                        <i class="bi bi-arrow-up-circle me-1"></i> Subir al inicio
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white py-4 border-top mt-5">
+        <div class="container text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-3 small">
+                <a href="index.html" class="text-muted text-decoration-none">Inicio</a> &bull;
+                <a href="about.html" class="text-muted text-decoration-none">Nosotros</a> &bull;
+                <a href="privacy.html" class="text-success fw-bold text-decoration-none">Política de Privacidad</a> &bull;
+                <a href="data-deletion.html" class="text-muted text-decoration-none">Eliminación de Datos</a> &bull;
+                <a href="terms.html" class="text-muted text-decoration-none">Términos de Servicio</a> &bull;
+                <a href="soporte.html" class="text-muted text-decoration-none">Soporte</a>
+            </div>
+            <p class="text-muted small m-0">&copy; 2026 AgroSmart Corporation. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll spy for sidebar links
+            const navLinks = document.querySelectorAll('.nav-link-legal');
+            const sections = document.querySelectorAll('.legal-card');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(sec => {
+                    const secTop = sec.offsetTop;
+                    if (window.pageYOffset >= (secTop - 160)) {
+                        current = sec.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+"""AgroSmart Python application."""
+

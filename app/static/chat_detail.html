@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 animate-slide-up">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="d-flex align-items-center gap-3">
+                    <a href="agrored.html" class="back-btn">←</a>
+                    <h2 id="chat-title" class="m-0" style="font-size: 18px;"></h2>
+                </div>
+                <a href="calls.html" class="btn-secondary btn-sm p-2 rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px;" title="Iniciar Videollamada">📹</a>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="message-input-container">
+                <form id="messageForm">
+                    <div class="input-wrapper">
+                        <textarea id="messageInput" placeholder="Escribe tu mensaje..." rows="1" class="message-input" required></textarea>
+                        <button type="submit" class="send-btn">📤</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+        let otherUserId = null;
+        let groupId = null;
+        let currentUser;
+        let displayedCount = 0;
+        let membersMap = {};
+
+        async function initChat() {
+            if (window.initLayout) await window.initLayout('chat');
+            await AuthObj.requireAuth();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let supportMode = urlParams.get('support') === 'true';
+            otherUserId = urlParams.get('id') ? parseInt(urlParams.get('id'), 10) : null;
+            groupId = urlParams.get('group_id') ? parseInt(urlParams.get('group_id'), 10) : null;
+            currentUser = await AuthObj.getCurrentUser();
+
+            const allUsers = await window.DB.getAllUsers();
+            allUsers.forEach(u => membersMap[u.id] = u);
+
+            if (supportMode) {
+                // Find a global owner to act as support
+                const adminUser = allUsers.find(u => u.role === 'global_owner') || allUsers.find(u => u.is_superuser);
+                if (adminUser && adminUser.id !== currentUser.id) {
+                    otherUserId = adminUser.id;
+                } else {
+                    window.showErrorModal("Atención", "No hay agentes de soporte disponibles en este momento.");
+                    window.location.href = 'agrored.html';
+                    return;
+                }
+            }
+
+            if (!otherUserId && !groupId) {
+                window.location.href = 'agrored.html';
+                return;
+            }
+
+            // Cache handled above
+
+            if (groupId) {
+                // Wait for the next tick to ensure we have myGroups loaded
+                const myGroups = await window.DB.getUserGroups(currentUser.id);
+                const currentGroup = myGroups.find(g => g.id === groupId);
+                
+                if (!currentGroup) {
+                    window.location.href = 'agrored.html'; // Not part of this group
+                    return;
+                }
+                
+                document.getElementById('chat-title').innerHTML = `👥 ${currentGroup.name}`;
+                document.querySelector('[title="Iniciar Videollamada"]').style.display = 'none'; // No group calls yet
+            } else {
+                const otherUser = allUsers.find(u => u.id === otherUserId);
+                if (!otherUser) {
+                    window.location.href = 'agrored.html';
+                    return;
+                }
+
+                // Verify friendship unless it's support mode or admin
+                if (!supportMode && !currentUser.is_superuser && !otherUser.is_superuser) {
+                    const friendships = await window.DB.getFriendships(currentUser.id);
+                    const isFriend = friendships.some(f => f.status === 'accepted' && (f.user_id1 === otherUserId || f.user_id2 === otherUserId));
+                    if (!isFriend) {
+                        alert("Debes ser amigo de este usuario para enviarle mensajes directos.");
+                        window.location.href = 'agrored.html';
+                        return;
+                    }
+                }
+
+                document.getElementById('chat-title').innerText = supportMode ? "🎧 Soporte Técnico" : (otherUser.full_name || otherUser.email);
+                
+                // Handle Video Call button click (1-to-1)
+                document.querySelector('[title="Iniciar Videollamada"]').onclick = async (e) => {
+                    e.preventDefault();
+                    const roomName = `AgroSmart_${Math.min(currentUser.id, otherUserId)}_${Math.max(currentUser.id, otherUserId)}`;
+                    await window.DB.sendMessage({
+                        sender_id: currentUser.id,
+                        receiver_id: otherUserId,
+                        text: `[CALL_INVITE:${roomName}]`
+                    });
+                    window.location.href = `calls.html?room=${roomName}`;
+                };
+            }
+
+            await renderMessages();
+            
+            // Polling for new messages
+            setInterval(renderMessages, 3000);
+        }
+
+        const messagesContainer = document.getElementById('messagesContainer');
+
+        function scrollBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function renderMessages() {
+            let msgs = [];
+            if (groupId) {
+                msgs = await window.DB.getGroupMessages(groupId);
+            } else {
+                msgs = await window.DB.getMessages(currentUser.id, otherUserId);
+                // Mark as read only in 1-to-1
+                await window.DB.markAsRead(otherUserId, currentUser.id);
+            }
+
+            if (msgs.length === displayedCount && displayedCount !== 0) return;
+            displayedCount = msgs.length;
+
+            let html = '';
+            msgs.forEach(m => {
+                const isSent = m.sender_id === currentUser.id;
+                const time = new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                let messageText = m.text;
+                let extraClass = '';
+                
+                // Group chat: show sender name
+                const senderObj = membersMap[m.sender_id] || { full_name: 'Usuario', email: 'Usuario', avatar_url: null };
+                const senderName = senderObj.full_name || senderObj.email || 'Usuario';
+                const senderLabel = (!isSent && groupId) ? `<div class="small text-muted mb-1" style="font-size:10px;">${senderName}</div>` : '';
+
+                // Check if it's a call invitation
+                if (m.text.startsWith('[CALL_INVITE:')) {
+                    const roomName = m.text.replace('[CALL_INVITE:', '').replace(']', '');
+                    messageText = `
+                        <div class="d-flex flex-column align-items-center gap-2 p-2">
+                            <span>🎥 Llamada iniciada</span>
+                            <a href="calls.html?room=${roomName}" class="btn-agro py-2 px-3 fw-bold decoration-none text-white ripple" style="font-size: 12px; border-radius: 12px; width: 100%; text-align: center;">UNIRSE AHORA</a>
+                        </div>
+                    `;
+                    extraClass = 'call-invitation';
+                }
+                
+                const avatarChar = senderName[0].toUpperCase();
+                let avatarImgHtml = `<div class="d-flex align-items-center justify-content-center bg-primary text-white fw-bold" style="width:100%; height:100%; font-size:12px;">${avatarChar}</div>`;
+                if (senderObj.avatar_url) {
+                    avatarImgHtml = `<img src="${senderObj.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+                const avatarHtml = `<div class="shadow-sm rounded-circle overflow-hidden flex-shrink-0" style="width: 32px; height: 32px; border: 1px solid var(--border-color);">${avatarImgHtml}</div>`;
+
+                html += `
+                    <div class="message ${isSent ? 'sent' : 'received'} ${extraClass}">
+                        ${!isSent ? avatarHtml : ''}
+                        <div class="message-content">
+                            ${senderLabel}
+                            ${messageText}
+                            <span class="message-time">${time} ${(!groupId && isSent && m.is_read) ? '✓✓' : ''}</span>
+                        </div>
+                        ${isSent ? avatarHtml : ''}
+                    </div>
+                `;
+            });
+
+            if(msgs.length === 0) {
+                html = `<div class="empty-state">👋 Inicia la conversación</div>`;
+            }
+
+            messagesContainer.innerHTML = html;
+            scrollBottom();
+        }
+
+        document.getElementById('messageForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if(text === '') return;
+
+            const payload = {
+                sender_id: currentUser.id,
+                text: text
+            };
+
+            if (groupId) {
+                payload.group_id = groupId;
+                payload.receiver_id = null; // Unused for group
+            } else {
+                payload.receiver_id = otherUserId;
+            }
+
+            await window.DB.sendMessage(payload);
+
+            input.value = '';
+            await renderMessages();
+        });
+
+        document.addEventListener('DOMContentLoaded', initChat);
+    </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario Oficial - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <style>
+        .hero-manual {
+            background: linear-gradient(135deg, #047857 0%, #065f46 50%, #022c22 100%);
+            color: white;
+            padding: 90px 0 60px;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(4, 120, 87, 0.2);
+        }
+        .hero-manual::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .manual-sidebar {
+            position: sticky;
+            top: 30px;
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+            background: var(--card-bg, #ffffff);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+        .manual-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .manual-sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        .nav-link-manual {
+            color: var(--text-muted, #64748b);
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: all 0.25s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 6px;
+        }
+        .nav-link-manual:hover, .nav-link-manual.active {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            transform: translateX(4px);
+        }
+        .nav-link-manual i {
+            font-size: 1.25rem;
+        }
+        .manual-card {
+            background: var(--card-bg, #ffffff);
+            border-radius: 28px;
+            padding: 40px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .manual-card:hover {
+            box-shadow: 0 20px 45px rgba(16, 185, 129, 0.12);
+        }
+        .manual-section-title {
+            font-weight: 800;
+            color: var(--text-main, #1e293b);
+            border-bottom: 3px solid rgba(16, 185, 129, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .manual-section-title i {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            padding: 10px;
+            border-radius: 16px;
+        }
+        .screenshot-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 25px 0;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .screenshot-container:hover {
+            transform: scale(1.01);
+        }
+        .screenshot-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .screenshot-caption {
+            background: rgba(4, 120, 87, 0.9);
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .search-box-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 8px 20px;
+            max-width: 600px;
+            margin: 25px auto 0;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .search-box-input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 1.05rem;
+            outline: none;
+        }
+        .search-box-input::placeholder {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #047857;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .alert-custom {
+            border-radius: 18px;
+            border: none;
+            border-left: 5px solid #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        @media (max-width: 991px) {
+            .manual-sidebar {
+                position: relative;
+                top: 0;
+                max-height: none;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <!-- Hero Section -->
+    <header class="hero-manual text-center animate__animated animate__fadeIn">
+        <div class="container position-relative z-1">
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2 text-uppercase fw-bold mb-3 shadow-sm" style="letter-spacing: 1px;">Enciclopedia Digital AgroSmart</span>
+            <h1 class="display-4 fw-black mb-3">Manual de Usuario Oficial</h1>
+            <p class="lead opacity-90 mx-auto" style="max-width: 750px;">
+                Guía paso a paso para dominar el ecosistema de inteligencia agrícola. Aprende a registrar parcelas, utilizar el mapa 3D meteorológico y consultar el calendario lunar.
+            </p>
+            
+            <div class="search-box-container">
+                <i class="bi bi-search fs-5 text-warning me-2"></i>
+                <input type="text" id="manualSearchInput" class="search-box-input" placeholder="Buscar en el manual (ej. fertilización, login, mapa 3D, chat)...">
+                <button class="btn btn-sm btn-light rounded-pill fw-bold px-3 text-success" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">Limpiar</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container my-5">
+        <div class="row g-4">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <nav class="manual-sidebar shadow-sm">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3 px-2 tracking-wider">Índice Temático</h6>
+                    <a href="#sec-intro" class="nav-link-manual active"><i class="bi bi-info-circle-fill"></i> 1. Introducción</a>
+                    <a href="#sec-acceso" class="nav-link-manual"><i class="bi bi-shield-lock-fill"></i> 2. Acceso y Cuenta</a>
+                    <a href="#sec-navegacion" class="nav-link-manual"><i class="bi bi-compass-fill"></i> 3. Navegación y Membresías</a>
+                    <a href="#sec-dashboard" class="nav-link-manual"><i class="bi bi-grid-1x2-fill"></i> 4. Panel (Dashboard)</a>
+                    <a href="#sec-cultivos" class="nav-link-manual"><i class="bi bi-tree-fill"></i> 5. Gestión de Cultivos</a>
+                    <a href="#sec-lunar" class="nav-link-manual"><i class="bi bi-moon-stars-fill"></i> 6. Asesor Lunar Premium</a>
+                    <a href="#sec-comunicacion" class="nav-link-manual"><i class="bi bi-chat-dots-fill"></i> 7. Comunicación y Calls</a>
+                    <a href="#sec-offline" class="nav-link-manual"><i class="bi bi-wifi-off"></i> 8. Modo Offline y Reglas</a>
+                    
+                    <hr class="my-4 border-secondary opacity-25">
+                    <div class="p-3 bg-light rounded-4 text-center border">
+                        <i class="bi bi-headset fs-2 text-primary mb-2"></i>
+                        <h6 class="fw-bold mb-1">¿Duda Técnica?</h6>
+                        <p class="small text-muted mb-3">Habla en vivo con nuestro Asistente Inteligente o soporte en línea.</p>
+                        <a href="soporte.html" class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold">Ir a Soporte</a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Manual Chapters -->
+            <div class="col-lg-9" id="chaptersContainer">
+                
+                <!-- 1. Introducción -->
+                <section id="sec-intro" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-star-fill"></i> Capítulo 1</div>
+                    <h2 class="manual-section-title"><i class="bi bi-info-circle-fill"></i> 1. Introducción al Sistema</h2>
+                    <p class="lead text-muted">
+                        Bienvenido a <strong>AgroSmart</strong>, la plataforma de inteligencia agrícola diseñada para transformar sus labores de campo mediante tecnología satelital y análisis de datos en tiempo real.
+                    </p>
+                    <p class="text-muted">
+                        Este ecosistema le permite no solo registrar la historia de sus parcelas, sino obtener asistencia técnica automatizada, notificaciones de fertilización, estudios lunares y contacto directo con su cooperativa o técnicos agrícolas. Este manual le guiará paso a paso por todas las herramientas disponibles para su rol como <strong>Agricultor</strong> o <strong>Productor</strong>.
+                    </p>
+                    <div class="alert-custom">
+                        <i class="bi bi-lightbulb-fill fs-3 text-success"></i>
+                        <div>
+                            <strong class="d-block text-dark mb-1">Nota de Compatibilidad</strong>
+                            <span class="text-muted small">El sistema AgroSmart está adaptado para computadoras de escritorio, tablets y teléfonos móviles, permitiendo su uso directamente en el campo.</span>
+                        </div>
+                    </div>
+                    <div class="alert-custom border-info mt-3" style="background: rgba(14, 165, 233, 0.08); border-left: 5px solid #0ea5e9;">
+                        <i class="bi bi-cpu-fill fs-3 text-info"></i>
+                        <div>
+                            <strong class="d-block text-dark mb-1">Cerebro AI y Membresía de Inteligencia Madre</strong>
+                            <span class="text-muted small">Toda la plataforma y estas guías están impulsadas por el motor <strong>OpenAI Códice (Codex - Créditos $100 USD)</strong> y la <strong>IA Madre OpenAI GPT-4o ($50 USD Créditos)</strong> utilizando nuestras membresías oficiales Pro. Además, las respuestas de voz humana de Jarvis son procesadas de forma nativa por <strong>ElevenLabs AI</strong>.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Acceso y Cuenta -->
+                <section id="sec-acceso" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-shield-lock-fill"></i> Capítulo 2</div>
+                    <h2 class="manual-section-title"><i class="bi bi-person-bounding-box"></i> 2. Gestión de Acceso y Cuenta</h2>
+                    <p class="text-muted mb-4">El ingreso a AgroSmart cuenta con niveles de seguridad estrictos para proteger la información confidencial de sus siembras y cooperativas.</p>
+                    
+                    <h4 class="fw-bold mt-4 mb-3">2.1. Iniciar Sesión</h4>
+                    <p class="text-muted">Si usted ya posee una cuenta registrada por su organización o cooperativa:</p>
+                    <ol class="text-muted mb-4">
+                        <li class="mb-2">Abra su navegador web y diríjase a la plataforma AgroSmart.</li>
+                        <li class="mb-2">En la pantalla principal, ingrese su <strong>Correo Electrónico</strong> y <strong>Contraseña</strong>.</li>
+                        <li class="mb-2">Haga clic en el botón verde <strong>"Iniciar Sesión"</strong>.</li>
+                        <li><em>Nota: Si es su primer ingreso en un dispositivo nuevo, es posible que el sistema le muestre un cartel de bienvenida confirmando su rol y el plan de licencia de su país.</em></li>
+                    </ol>
+                    <div class="screenshot-container">
+                        <img src="screenshots/login.png" alt="Pantalla de Acceso (Login)" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 2.1: Pantalla de Acceso (Login) al sistema</div>
+                    </div>
+
+                    <hr class="my-5 border-secondary opacity-25">
+
+                    <h4 class="fw-bold mb-3">2.2. Registro y Verificación (OTP)</h4>
+                    <p class="text-muted">Si necesita crear una cuenta nueva y su país o asociación lo permite:</p>
+                    <ol class="text-muted mb-4">
+                        <li class="mb-2">En la pantalla de login, haga clic en el enlace inferior: <strong>"¿No tienes cuenta? Regístrate aquí"</strong>.</li>
+                        <li class="mb-2">Seleccione su país de residencia e ingrese su correo electrónico personal o de trabajo.</li>
+                        <li class="mb-2">El sistema le enviará un código de 6 dígitos a su correo. Introdúzcalo en la pantalla de verificación (Código OTP).</li>
+                        <li>Finalmente, cree y confirme su nueva contraseña segura (mínimo 6 caracteres).</li>
+                    </ol>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="screenshot-container h-100 m-0">
+                                <img src="screenshots/register.png" alt="Pantalla de Registro" class="screenshot-img" onerror="this.style.display='none'">
+                                <div class="screenshot-caption">Figura 2.2a: Formulario de Registro</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="screenshot-container h-100 m-0">
+                                <img src="screenshots/otp.png" alt="Verificación OTP" class="screenshot-img" onerror="this.style.display='none'">
+                                <div class="screenshot-caption">Figura 2.2b: Verificación por Código OTP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-5 border-secondary opacity-25">
+
+                    <h4 class="fw-bold mb-3">2.3. Recuperación de Contraseña</h4>
+                    <p class="text-muted">Si olvida sus credenciales de acceso:</p>
+                    <ol class="text-muted mb-4">
+                        <li class="mb-2">Haga clic en <strong>"¿Olvidaste tu contraseña?"</strong> desde la pantalla principal de login.</li>
+                        <li class="mb-2">Ingrese su correo registrado. Recibirá un nuevo código numérico de seguridad.</li>
+                        <li>Al validarlo con éxito, el sistema le permitirá crear una nueva contraseña y restaurar su acceso de inmediato.</li>
+                    </ol>
+                    <div class="screenshot-container">
+                        <img src="screenshots/recover.png" alt="Recuperación de Contraseña" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 2.3: Ventana de Recuperación de Credenciales</div>
+                    </div>
+                </section>
+
+                <!-- 3. Navegación y Membresías -->
+                <section id="sec-navegacion" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-compass-fill"></i> Capítulo 3</div>
+                    <h2 class="manual-section-title"><i class="bi bi-layout-sidebar-inset"></i> 3. Navegación y Membresías (Mi Plan)</h2>
+                    <p class="text-muted">
+                        El menú izquierdo (Navbar) es su brújula dentro de AgroSmart. Sin embargo, las opciones que usted vea dependerán directamente del <strong>Plan de Membresía</strong> que su país o cooperativa haya adquirido.
+                    </p>
+                    <div class="row g-3 my-4">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-4 border bg-light text-center h-100">
+                                <span class="badge bg-warning text-dark mb-2 px-3 py-2 rounded-pill fw-bold">Etiqueta de Plan</span>
+                                <p class="small text-muted m-0">En la esquina superior izquierda, junto al logo de AgroSmart, verá su nivel de licencia actual (Básico, Bronce, Platinium, Diamante o Esmeralda).</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-4 border bg-light text-center h-100">
+                                <span class="badge bg-success text-white mb-2 px-3 py-2 rounded-pill fw-bold">Menú Dinámico</span>
+                                <p class="small text-muted m-0">El sistema habilitará automáticamente botones especiales si usted tiene una membresía alta. Por ejemplo, <strong>Videollamadas</strong> solo visible en planes Diamante o Esmeralda.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-4 border bg-light text-center h-100">
+                                <span class="badge bg-danger text-white mb-2 px-3 py-2 rounded-pill fw-bold">Notificaciones</span>
+                                <p class="small text-muted m-0">Al lado del botón "Chat" o "AgroRed", aparecerá un globo rojo con un número si tiene mensajes sin leer o notificaciones agronómicas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Panel de Control -->
+                <section id="sec-dashboard" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-grid-1x2-fill"></i> Capítulo 4</div>
+                    <h2 class="manual-section-title"><i class="bi bi-speedometer2"></i> 4. Panel de Control (Dashboard)</h2>
+                    <p class="text-muted">
+                        Una vez iniciada la sesión con éxito, será llevado a su <strong>Dashboard</strong>. Esta es la pantalla más completa del sistema y funciona como su centro de mando integral.
+                    </p>
+                    <div class="screenshot-container">
+                        <img src="screenshots/dashboard.png" alt="Panel de Control Principal" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 4.0: Vista General del Panel de Control (Dashboard)</div>
+                    </div>
+
+                    <h4 class="fw-bold mt-4 mb-3">4.1. Resumen de Mis Cultivos</h4>
+                    <p class="text-muted">En la parte media superior, verá tarjetas con la información resumida de cada una de sus parcelas activas:</p>
+                    <ul class="text-muted mb-4">
+                        <li class="mb-2"><strong>Nombre y Descripción:</strong> Tipo de cultivo sembrado y detalles técnicos adicionales ingresados.</li>
+                        <li class="mb-2"><strong>Fecha de Siembra:</strong> Calculada de manera automática para llevar el tiempo exacto del ciclo vegetativo.</li>
+                        <li class="mb-2"><strong>Botones Rápidos de Acción:</strong>
+                            <ul>
+                                <li class="mt-1"><strong>Abonado:</strong> Le lleva directamente al cronograma y fechas recomendadas para aplicación de fertilizantes o químicos.</li>
+                                <li class="mt-1"><strong>Editar/Ver:</strong> Permite cambiar o inspeccionar los datos técnicos de la parcela.</li>
+                                <li class="mt-1"><strong>Eliminar:</strong> Borra el registro si la parcela fue cosechada, descartada o reemplazada.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h4 class="fw-bold mt-4 mb-3">4.2. Mapa Meteorológico 3D Interactivo</h4>
+                    <p class="text-muted">La parte inferior del Dashboard incluye un espectacular <strong>globo satelital en 3D</strong> impulsado por motores geoespaciales de alta precisión.</p>
+                    <ul class="text-muted">
+                        <li class="mb-2"><strong>Pines y Clusters:</strong> Verá hojas verdes marcando la ubicación exacta de sus cultivos. Si hay muchos cultivos cercanos, verá un cluster circular agrupando la cantidad. Al hacer clic sobre los pines, se abrirá un cuadro emergente con información climática y técnica de esa siembra.</li>
+                        <li class="mb-2"><strong>Buscador de Terrenos:</strong> Utilice la barra de búsqueda integrada en el mapa para acercar la cámara satelital a sus coordenadas exactas antes de crear un nuevo cultivo.</li>
+                        <li class="mb-2"><strong>Capas de Clima:</strong> Si su plan lo incluye y cuenta con conexión, el mapa mostrará en tiempo real nubosidad, precipitaciones y proyecciones de viento sobre sus terrenos.</li>
+                    </ul>
+                </section>
+
+                <!-- 5. Gestión Inteligente de Cultivos -->
+                <section id="sec-cultivos" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-tree-fill"></i> Capítulo 5</div>
+                    <h2 class="manual-section-title"><i class="bi bi-cpu-fill"></i> 5. Gestión Inteligente de Cultivos</h2>
+                    <p class="text-muted">Esta es la herramienta fundamental de AgroSmart: no solo almacena sus registros agronómicos, sino que automatiza y calcula sus labores de campo.</p>
+
+                    <h4 class="fw-bold mt-4 mb-3">5.1. Catálogo Técnico</h4>
+                    <p class="text-muted">Antes de registrar su tierra, puede visitar la sección <strong>Catálogo</strong> en el menú. Aquí encontrará la enciclopedia técnica oficial con todos los cultivos soportados por el ministerio o su cooperativa. Verá sus características climáticas óptimas, rendimientos esperados por hectárea y el <em>Plan Estándar de Fertilización</em>.</p>
+                    <div class="screenshot-container">
+                        <img src="screenshots/catalog.png" alt="Catálogo Técnico" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 5.1: Enciclopedia y Catálogo Agronómico</div>
+                    </div>
+
+                    <hr class="my-5 border-secondary opacity-25">
+
+                    <h4 class="fw-bold mb-3">5.2. Registro de Nuevas Parcelas</h4>
+                    <p class="text-muted">Para agregar un nuevo terreno a su mando en la plataforma:</p>
+                    <ol class="text-muted mb-4">
+                        <li class="mb-2">Haga clic en <strong>"Registrar"</strong> en su menú lateral izquierdo.</li>
+                        <li class="mb-2">Ingrese el <strong>Nombre del Cultivo</strong> (asegúrese de usar un nombre exacto del catálogo oficial, como <em>Maíz</em>, <em>Frijol</em>, <em>Café</em> o <em>Tomate</em>).</li>
+                        <li class="mb-2">Seleccione la fecha exacta de siembra en el calendario desplegable.</li>
+                        <li class="mb-2">Elija sus coordenadas en el mapa satelital. Si tiene su GPS encendido en el dispositivo, el sistema puede auto-detectar su posición real en la parcela.</li>
+                        <li>Al hacer clic en "Guardar Parcela", el sistema vinculará la ficha técnica a su perfil.</li>
+                    </ol>
+                    <div class="screenshot-container">
+                        <img src="screenshots/crop_create.png" alt="Registro de Cultivo" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 5.2: Formulario de Registro Georreferenciado de Parcelas</div>
+                    </div>
+
+                    <hr class="my-5 border-secondary opacity-25">
+
+                    <h4 class="fw-bold mb-3">5.3. Plan Automático de Fertilización</h4>
+                    <p class="text-muted">El mayor beneficio de registrar correctamente su cultivo es la generación automática del <strong>Plan de Abonado</strong>. Cuando el sistema detecta que usted sembró, por ejemplo, "Maíz", creará en su base de datos todas las fechas en las que debe aplicar fertilizantes, nutrientes o plaguicidas durante los próximos meses, calculando los días transcurridos respecto a la fecha de siembra indicada.</p>
+                </section>
+
+                <!-- 6. Asesor Lunar Premium -->
+                <section id="sec-lunar" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-moon-stars-fill"></i> Capítulo 6</div>
+                    <h2 class="manual-section-title"><i class="bi bi-brightness-high-fill"></i> 6. Asesor Lunar Premium</h2>
+                    <p class="text-muted">AgroSmart honra el conocimiento agronómico tradicional y ancestral, combinándolo con astronomía computacional moderna para garantizar que sus decisiones de siembra, poda y cosecha se realicen en el momento astronómico óptimo.</p>
+                    
+                    <div class="screenshot-container">
+                        <img src="screenshots/moon_calendar.png" alt="Asesor Lunar" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 6.0: Asesor Lunar e Interfaz de Sincronización Astral</div>
+                    </div>
+
+                    <h4 class="fw-bold mt-4 mb-3">6.1. Sincronización Astral</h4>
+                    <ol class="text-muted mb-4">
+                        <li class="mb-2">Ingrese a la sección <strong>"Calendario Lunar"</strong> en el menú lateral.</li>
+                        <li class="mb-2">Busque sus tierras en el mapa 3D y haga clic para dejar el pin amarillo de referencia geoespacial (esto permite calcular las horas exactas de salida del sol y de la luna para sus coordenadas locales).</li>
+                        <li>Seleccione la fecha que desea investigar en el calendario y haga clic en <strong>"Analizar Ciclo Astral"</strong>.</li>
+                    </ol>
+
+                    <h4 class="fw-bold mt-4 mb-3">6.2. Recomendaciones de Siembra y Cosecha</h4>
+                    <p class="text-muted mb-3">El sistema le revelará la fase lunar, el porcentaje de iluminación astronómica y las horas exactas de orto/ocaso solar. Con base en esta información científica y empírica:</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 border bg-dark text-white h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2 text-warning fw-bold">
+                                    <i class="bi bi-moon fs-5"></i> Luna Nueva
+                                </div>
+                                <p class="small opacity-85 m-0">Ideal para labores de mantenimiento, poda de limpieza y aplicación de abonos o tratamientos en la zona radicular. El crecimiento foliar de las hojas es mínimo en esta fase.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 border bg-light text-dark h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2 text-success fw-bold">
+                                    <i class="bi bi-moon-half fs-5"></i> Cuarto Creciente
+                                </div>
+                                <p class="small text-muted m-0">Recomendado para sembrar cultivos que crecen sobre el suelo (tomate, pimiento, maíz, frijol). La savia asciende con fuerza hacia los tallos y hojas.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 border bg-warning bg-opacity-25 text-dark h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2 text-dark fw-bold">
+                                    <i class="bi bi-moon-fill fs-5"></i> Luna Llena
+                                </div>
+                                <p class="small text-muted m-0">Ideal para la <strong>cosecha de frutos</strong>. Las plantas concentran la mayor cantidad de savia, nutrientes y azúcares en la parte superior del follaje y los frutos.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 border bg-secondary bg-opacity-10 text-dark h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2 text-secondary fw-bold">
+                                    <i class="bi bi-moon fs-5" style="transform: scaleX(-1);"></i> Cuarto Menguante
+                                </div>
+                                <p class="small text-muted m-0">Recomendado para sembrar cultivos de raíz o tubérculos (zanahoria, rábano, papa, yuca). La savia desciende rápidamente de regreso hacia las raíces.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. Ecosistema de Comunicación -->
+                <section id="sec-comunicacion" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-chat-dots-fill"></i> Capítulo 7</div>
+                    <h2 class="manual-section-title"><i class="bi bi-people-fill"></i> 7. Ecosistema de Comunicación</h2>
+                    <p class="text-muted">Usted nunca estará aislado trabajando sus tierras. AgroSmart integra potentes herramientas colaborativas para mantenerlo en contacto permanente con su comunidad y expertos agrónomos.</p>
+
+                    <h4 class="fw-bold mt-4 mb-3">7.1. Sistema de Mensajería y AgroRed</h4>
+                    <p class="text-muted mb-3">En las secciones <strong>"Chat"</strong> y <strong>"AgroRed"</strong>, encontrará áreas especializadas para el intercambio de información:</p>
+                    <ul class="text-muted mb-4">
+                        <li class="mb-2"><strong>Chat Directo / Asesoría:</strong> Comuníquese individualmente con técnicos o administradores de su cooperativa. Use el buscador integrado para localizar profesionales.</li>
+                        <li class="mb-2"><strong>Grupos Cooperativos:</strong> Podrá organizar compras conjuntas de fertilizantes o coordinar logística de envíos con otros agricultores vecinos. El historial se resguarda en la nube y de manera local en su dispositivo.</li>
+                    </ul>
+                    <div class="screenshot-container">
+                        <img src="screenshots/chat_system.png" alt="Sistema de Chat" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 7.1: Sistema de Mensajería y Asistencia Agronómica</div>
+                    </div>
+
+                    <hr class="my-5 border-secondary opacity-25">
+
+                    <h4 class="fw-bold mb-3">7.2. Asistencia Técnica por Videollamadas</h4>
+                    <p class="small text-primary fw-bold mb-2"><i class="bi bi-star-fill me-1"></i> Característica Exclusiva para Planes Diamante y Esmeralda</p>
+                    <p class="text-muted">Si encuentra una plaga desconocida, enfermedad foliar o necesita inspección agronómica urgente en vivo:</p>
+                    <ol class="text-muted mb-4">
+                        <li class="mb-2">Navegue a la sección <strong>"Videollamadas"</strong> en el menú principal.</li>
+                        <li class="mb-2">Ingrese el ID de la sala proporcionado por su ingeniero técnico o cree una sala nueva para enviar la invitación.</li>
+                        <li>El sistema conectará su cámara web o la cámara trasera de su dispositivo móvil en tiempo real, permitiendo mostrar la parcela y las hojas al ingeniero agrónomo sin que este deba desplazarse físicamente al terreno.</li>
+                    </ol>
+                    <div class="screenshot-container">
+                        <img src="screenshots/calls.png" alt="Videollamadas" class="screenshot-img" onerror="this.style.display='none'">
+                        <div class="screenshot-caption"><i class="bi bi-camera-fill me-2"></i>Figura 7.2: Interfaz de Videollamadas de Alta Definición para Diagnóstico en Campo</div>
+                    </div>
+                </section>
+
+                <!-- 8. Consideraciones Críticas y Modo Offline -->
+                <section id="sec-offline" class="manual-card animate__animated animate__fadeInUp">
+                    <div class="feature-badge"><i class="bi bi-wifi-off"></i> Capítulo 8</div>
+                    <h2 class="manual-section-title"><i class="bi bi-shield-exclamation"></i> 8. Consideraciones Críticas y Modo Offline</h2>
+                    
+                    <div class="alert-custom border-primary mb-4" style="background: rgba(59, 130, 246, 0.08); border-left-color: #3b82f6;">
+                        <i class="bi bi-cloud-check-fill fs-2 text-primary"></i>
+                        <div>
+                            <strong class="d-block text-dark mb-1">Resiliencia en Zonas Rurales (Modo 100% Offline)</strong>
+                            <p class="text-muted small m-0">
+                                AgroSmart entiende que en zonas rurales y campos agrícolas la señal de internet celular o Wi-Fi puede ser inestable o nula. <strong>Si pierde conexión, la aplicación seguirá totalmente activa.</strong> Podrá seguir navegando por su Dashboard, revisando el catálogo técnico, agregando registros y consultando el calendario lunar. El sistema almacenará sus datos en la memoria local interna y los sincronizará de forma automática y transparente a los servidores en la nube en cuanto recupere la señal.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="alert-custom border-danger" style="background: rgba(239, 68, 68, 0.08); border-left-color: #ef4444;">
+                        <i class="bi bi-exclamation-triangle-fill fs-2 text-danger"></i>
+                        <div>
+                            <strong class="d-block text-dark mb-1">Políticas de Uso y Sanciones Automáticas</strong>
+                            <p class="text-muted small m-0">
+                                Para mantener la seguridad del ecosistema, el incumplimiento reiterado de normas agronómicas de la cooperativa o el uso indebido del chat comunitario puede conllevar a una suspensión temporal de su cuenta por parte de un administrador gubernamental o cooperativo. Si esto ocurre, el sistema le redirigirá automáticamente a una pantalla de seguridad desde donde podrá enviar una solicitud formal de apelación para restaurar su licencia.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5 pt-4 border-top">
+                        <p class="small text-muted m-0">&copy; 2026 AgroSmart Corporation. Infraestructura Agrícola Confidencial. Todos los derechos reservados.</p>
+                        <a href="#navbar-container" class="btn btn-sm btn-link text-success text-decoration-none mt-2 fw-bold"><i class="bi bi-arrow-up-circle me-1"></i> Volver al inicio del manual</a>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.initLayout) window.initLayout('manual');
+            
+            // Search filter functionality
+            const searchInput = document.getElementById('manualSearchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const sections = document.querySelectorAll('.manual-card');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const term = e.target.value.toLowerCase().trim();
+                    if (term.length > 0) {
+                        clearBtn.style.display = 'inline-block';
+                    } else {
+                        clearBtn.style.display = 'none';
+                    }
+                    
+                    sections.forEach(sec => {
+                        const text = sec.textContent.toLowerCase();
+                        if (text.includes(term)) {
+                            sec.style.display = 'block';
+                            sec.style.animation = 'fadeIn 0.5s';
+                        } else {
+                            sec.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Active sidebar link scrolling highlight
+            const navLinks = document.querySelectorAll('.nav-link-manual');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(sec => {
+                    const secTop = sec.offsetTop;
+                    const secHeight = sec.clientHeight;
+                    if (pageYOffset >= (secTop - 150)) {
+                        current = sec.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        function clearSearch() {
+            const searchInput = document.getElementById('manualSearchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const sections = document.querySelectorAll('.manual-card');
+            
+            if (searchInput) {
+                searchInput.value = '';
+                clearBtn.style.display = 'none';
+                sections.forEach(sec => {
+                    sec.style.display = 'block';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Actividades del Cultivo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 animate-slide-up">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 id="crop-title" class="dashboard-title m-0">Gestión de Nutrición</h2>
+            <div class="d-flex gap-2">
+                <a href="dashboard.html" class="btn btn-agro-light btn-sm">Dashboard</a>
+            </div>
+        </div>
+        
+        <div class="agro-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-success m-0">📦 Plan de Fertilización Automatizado</h5>
+                <div id="regenerate-container" style="display:none;">
+                    <button onclick="forceRegeneratePlan()" class="btn btn-agro-outline btn-xs">Regenerar Plan técnico</button>
+                </div>
+            </div>
+            <p class="text-muted small">El sistema ha programado estos abonos basándose en la fecha de siembra y los requerimientos técnicos del catálogo.</p>
+            
+            <div class="admin-table-container overflow-hidden rounded-4 border mt-3">
+                <table class="agro-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nutriente / Producto</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="abonos-tbody">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between small text-muted">
+            <span>Nota: Los abonos marcados como "Atrasados" pueden afectar el rendimiento final.</span>
+            <span id="last-updated"></span>
+        </div>
+
+        <!-- Unified Crop Activities Section (WhatsApp-Ready) -->
+        <div class="agro-card p-4 mb-4 mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0" style="color: #25D366;"><i class="bi bi-whatsapp me-2"></i>Actividades Programadas</h5>
+                <span class="badge bg-light text-muted" id="activities-count">0 actividades</span>
+            </div>
+            <p class="text-muted small">Actividades automatizadas que generarán recordatorios por WhatsApp. Incluye abonado, riego, poda, fumigación y cosecha.</p>
+            
+            <div class="admin-table-container overflow-hidden rounded-4 border mt-3">
+                <table class="agro-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activities-tbody">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/config.js"></script>
+    <script src="js/crop_catalog.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/notification-service.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+        let cropId;
+        let currentUser;
+        let currentCrop;
+
+        async function initAbonos() {
+            if (window.initLayout) await window.initLayout('dashboard'); // Related to crop dashboard
+            await AuthObj.requireAuth();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            cropId = parseInt(urlParams.get('id'), 10);
+            currentUser = await AuthObj.getCurrentUser();
+            
+            const allCrops = await window.DB.getAllCrops();
+            currentCrop = allCrops.find(c => c.id === cropId);
+
+            if (!currentCrop || (currentCrop.user_id != currentUser.id && currentUser.role !== 'global_owner' && !currentUser.is_superuser)) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            document.getElementById('crop-title').innerText = `Actividades: ${currentCrop.name}`;
+            await renderAbonos();
+            await renderCropActivities();
+        }
+
+        async function getAbonos() {
+            if (window.DB.supabase) {
+                const { data, error } = await window.DB.supabase.from('fertilizer_logs').select('*').eq('crop_id', cropId).order('scheduled_date', { ascending: true });
+                if (error) console.warn("Abono fetch warning:", error);
+                return data || [];
+            }
+            const db = window.DB.getLocalDB();
+            return (db.fertilizer_logs || []).filter(a => a.crop_id == cropId).sort((a,b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
+        }
+
+        async function updateAbonoStatus(id, newStatus, undo = false) {
+            if (!undo && newStatus === 'no_aplicado') {
+                const result = await Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Omitir un abonado en esta etapa puede reducir el crecimiento radicular y la resistencia a plagas. ¿Deseas continuar?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, omitir',
+                    cancelButtonText: 'Cancelar'
+                });
+                if (!result.isConfirmed) return false;
+            }
+
+            if (window.DB.supabase) {
+                const { error } = await window.DB.supabase.from('fertilizer_logs').update({ status: newStatus }).eq('id', id);
+                if (error) console.warn("Abono update warning:", error);
+            } else {
+                const db = window.DB.getLocalDB();
+                const log = db.fertilizer_logs.find(a => a.id === id);
+                if(log) log.status = newStatus;
+                window.DB.saveLocalDB(db);
+            }
+            return true;
+        }
+
+        async function renderAbonos() {
+            const abonos = await getAbonos();
+            const tbody = document.getElementById('abonos-tbody');
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            const regenerateContainer = document.getElementById('regenerate-container');
+
+            if (abonos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No hay un plan técnico disponible para este cultivo.</td></tr>';
+                regenerateContainer.style.display = 'block';
+                return;
+            } else {
+                regenerateContainer.style.display = 'none';
+            }
+            
+            // ... (rest of the renderAbonos function)
+
+            let html = '';
+            abonos.forEach(ab => {
+                const scheduledDate = new Date(ab.scheduled_date + 'T00:00:00');
+                let statusBadge = '';
+                let statusText = ab.status || 'pendiente';
+                let isLate = scheduledDate < now && statusText === 'pendiente' && ab.scheduled_date !== todayStr;
+
+                if (statusText === 'aplicado') {
+                    statusBadge = '<span class="badge bg-success-soft text-success"><i class="bi bi-check-circle me-1"></i>Aplicado</span>';
+                } else if (statusText === 'no_aplicado') {
+                    statusBadge = '<span class="badge bg-danger-soft text-danger"><i class="bi bi-x-circle me-1"></i>Omitido</span>';
+                } else if (isLate) {
+                    statusBadge = '<span class="badge bg-warning-soft text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Atrasado</span>';
+                } else {
+                    statusBadge = '<span class="badge bg-light text-muted">Pendiente</span>';
+                }
+
+                let actions = '';
+                if (statusText === 'pendiente') {
+                    actions = `
+                        <div class="d-flex justify-content-end gap-2">
+                            <button onclick="changeStatus(${ab.id}, 'aplicado')" class="btn btn-agro-primary btn-xs">Aplicar</button>
+                            <button onclick="changeStatus(${ab.id}, 'no_aplicado')" class="btn btn-outline-danger btn-xs">Omitir</button>
+                        </div>
+                    `;
+                } else {
+                    actions = `
+                        <div class="d-flex justify-content-end">
+                            <button onclick="changeStatus(${ab.id}, 'pendiente', true)" class="btn btn-link text-muted btn-xs text-decoration-none">Deshacer</button>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <tr>
+                        <td class="small fw-medium">${scheduledDate.toLocaleDateString()}</td>
+                        <td>
+                            <div class="fw-bold">${ab.product || ab.tip || 'Abono'}</div>
+                            <div class="small text-muted">${ab.dose || ''}</div>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td class="text-end">${actions}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        window.changeStatus = async function(id, status, undo = false) {
+            const success = await updateAbonoStatus(id, status, undo);
+            if (success) {
+                await renderAbonos();
+                if (!undo && status === 'aplicado') {
+                    Swal.fire({
+                        title: '¡Excelente!',
+                        text: 'La aplicación ha sido registrada correctamente.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            }
+        };
+
+        window.forceRegeneratePlan = async function() {
+            if (!currentCrop) return;
+            
+            Swal.fire({
+                title: 'Generando plan...',
+                text: 'Buscando requerimientos técnicos en el catálogo.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                // Returns true if logs were created, false if crop not found in catalog
+                const success = await window.DB.generateFertilizerLogs(currentCrop);
+                
+                if (success) {
+                    setTimeout(async () => {
+                        await renderAbonos();
+                        Swal.close();
+                        Swal.fire('¡Listo!', 'El plan técnico ha sido sincronizado exitosamente.', 'success');
+                    }, 800);
+                } else {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Sin plan técnico',
+                        text: `No encontramos una ficha exacta para "${currentCrop.name}" en nuestro catálogo. Intenta usar nombres estándar como "Café" o "Tomate" en el nombre del cultivo.`,
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            } catch (e) {
+                console.warn("Regenerate plan warning:", e);
+                Swal.fire('Error', 'No se pudo generar el plan: ' + e.message, 'error');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', initAbonos);
+
+        // --- Unified Crop Activities Rendering ---
+        const ACTIVITY_ICONS = {
+            'abonado': '🧪',
+            'fertilizacion': '🌿',
+            'riego': '💧',
+            'poda': '✂️',
+            'fumigacion': '🛡️',
+            'cosecha': '🌾'
+        };
+
+        const ACTIVITY_LABELS = {
+            'abonado': 'Abonado',
+            'fertilizacion': 'Fertilización',
+            'riego': 'Riego',
+            'poda': 'Poda',
+            'fumigacion': 'Fumigación',
+            'cosecha': 'Cosecha'
+        };
+
+        async function renderCropActivities() {
+            const tbody = document.getElementById('activities-tbody');
+            const countBadge = document.getElementById('activities-count');
+            if (!tbody) return;
+
+            try {
+                const activities = await window.DB.getCropActivitiesByCrop(cropId);
+                countBadge.textContent = `${activities.length} actividad${activities.length !== 1 ? 'es' : ''}`;
+
+                if (activities.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No hay actividades programadas para este cultivo.</td></tr>';
+                    return;
+                }
+
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                let html = '';
+
+                activities.forEach(act => {
+                    const scheduledDate = new Date(act.scheduled_date + 'T00:00:00');
+                    const isLate = scheduledDate < now && act.status === 'pendiente' && act.scheduled_date !== todayStr;
+                    const isToday = act.scheduled_date === todayStr;
+                    const icon = ACTIVITY_ICONS[act.activity_type] || '📋';
+                    const label = ACTIVITY_LABELS[act.activity_type] || act.activity_type;
+
+                    let statusBadge = '';
+                    if (act.status === 'realizado') {
+                        statusBadge = '<span class="badge bg-success-soft text-success"><i class="bi bi-check-circle me-1"></i>Realizado</span>';
+                    } else if (act.status === 'omitido') {
+                        statusBadge = '<span class="badge bg-danger-soft text-danger"><i class="bi bi-x-circle me-1"></i>Omitido</span>';
+                    } else if (act.status === 'reprogramado') {
+                        const newDate = act.rescheduled_to ? new Date(act.rescheduled_to + 'T00:00:00').toLocaleDateString() : '—';
+                        statusBadge = `<span class="badge bg-info-soft text-info"><i class="bi bi-calendar-event me-1"></i>→ ${newDate}</span>`;
+                    } else if (isLate) {
+                        statusBadge = '<span class="badge bg-warning-soft text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Atrasado</span>';
+                    } else if (isToday) {
+                        statusBadge = '<span class="badge bg-primary-soft text-primary"><i class="bi bi-clock me-1"></i>Hoy</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-light text-muted">Pendiente</span>';
+                    }
+
+                    let waIcon = '';
+                    if (act.whatsapp_reminder_sent) {
+                        waIcon = '<i class="bi bi-whatsapp text-success ms-1" title="Recordatorio enviado"></i>';
+                    }
+
+                    let actions = '';
+                    if (act.status === 'pendiente') {
+                        actions = `
+                            <div class="d-flex justify-content-end gap-2">
+                                <button onclick="changeActivityStatus(${act.id}, 'realizado')" class="btn btn-agro-primary btn-xs">✅ Hecho</button>
+                                <button onclick="changeActivityStatus(${act.id}, 'omitido')" class="btn btn-outline-danger btn-xs">Omitir</button>
+                            </div>
+                        `;
+                    } else if (act.status !== 'reprogramado') {
+                        actions = `
+                            <div class="d-flex justify-content-end">
+                                <button onclick="changeActivityStatus(${act.id}, 'pendiente')" class="btn btn-link text-muted btn-xs text-decoration-none">Deshacer</button>
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                        <tr>
+                            <td class="small fw-medium">${scheduledDate.toLocaleDateString()}</td>
+                            <td><span class="me-1">${icon}</span>${label}</td>
+                            <td class="small">${act.description || '—'} ${waIcon}</td>
+                            <td>${statusBadge}</td>
+                            <td class="text-end">${actions}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+            } catch(e) {
+                console.warn('Error rendering crop activities:', e);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Error cargando actividades.</td></tr>';
+            }
+        }
+
+        window.changeActivityStatus = async function(activityId, status) {
+            if (status === 'omitido') {
+                const result = await Swal.fire({
+                    title: '¿Omitir actividad?',
+                    text: 'Omitir esta actividad puede afectar la salud del cultivo. ¿Deseas continuar?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, omitir',
+                    cancelButtonText: 'Cancelar'
+                });
+                if (!result.isConfirmed) return;
+            }
+
+            try {
+                await window.DB.updateCropActivityStatus(activityId, status);
+                await renderCropActivities();
+
+                if (status === 'realizado') {
+                    Swal.fire({
+                        title: '¡Excelente!',
+                        text: 'La actividad ha sido registrada como realizada.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            } catch(e) {
+                Swal.fire('Error', 'No se pudo actualizar la actividad.', 'error');
+            }
+        };
+    </script>
+</body>
+</html>

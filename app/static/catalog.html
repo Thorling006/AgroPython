@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Tecnológico - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 animate-slide-up">
+        <div class="dashboard-header-v2 mb-4">
+            <div class="icon-agro-v2 bg-success text-white">
+                <i class="bi bi-book-half"></i>
+            </div>
+            <div>
+                <h1 class="dashboard-title m-0 text-start">Catálogo de Cultivos</h1>
+                <p class="text-muted mb-0">Base de datos técnica con parámetros óptimos de siembra y abonado.</p>
+            </div>
+        </div>
+
+        <div class="row mb-4 animate-slide-up">
+            <div class="col-12">
+                <div class="p-4 bg-light rounded-4 border-start border-4 border-success shadow-sm d-flex align-items-center gap-3">
+                    <div class="bg-white p-3 rounded-circle shadow-sm d-none d-md-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-shield-check text-success fs-3 m-0"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-agro-primary mb-2">Información Oficial y Verificada</h5>
+                        <p class="text-muted small mb-0">
+                            Los parámetros agronómicos y calendarios de abonado aquí expuestos han sido <strong>rigurosamente desarrollados y aprobados</strong> por el equipo de profesionales agrícolas de AgroSmart. Nuestra metodología probada garantiza soluciones de cultivo y esquemas de fertilización 100% confiables para maximizar tu rendimiento.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="catalog-grid">
+            <!-- Catalog items injected by JS -->
+        </div>
+    </div>
+
+    <!-- Modal de Ficha Técnica -->
+    <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 pt-0" id="modal-content">
+                    <!-- Detalle inyectado -->
+                </div>
+                <div class="modal-footer border-0 p-4">
+                    <button type="button" class="btn btn-agro-light px-4" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-agro-primary px-4" onclick="redirectToRegister()">Registrar este cultivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/crop_catalog.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.initLayout) await window.initLayout('catalog');
+            renderCatalog();
+            
+            // Handle search param for automatic modal opening
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchParam = urlParams.get('search');
+            if (searchParam && window.CROP_CATALOG) {
+                const normalize = (s) => (s || "").toLowerCase().trim();
+                const sName = normalize(searchParam);
+                const matchKey = Object.keys(window.CROP_CATALOG).find(k => 
+                    normalize(window.CROP_CATALOG[k].name) === sName || 
+                    normalize(window.CROP_CATALOG[k].name).includes(sName) ||
+                    sName.includes(normalize(window.CROP_CATALOG[k].name))
+                );
+                if (matchKey) {
+                    // Small timeout to ensure DOM is ready and modal transitions properly
+                    setTimeout(() => showDetails(matchKey), 300);
+                }
+            }
+        });
+
+        function renderCatalog() {
+            const container = document.getElementById('catalog-grid');
+            if (!container) return;
+            
+            let html = '';
+            // Usamos Object.entries para obtener la llave (que actúa como ID)
+            Object.entries(window.CROP_CATALOG || {}).forEach(([id, c]) => {
+                html += `
+                <div class="col-lg-4 col-md-6 mb-4 animate-slide-up">
+                    <div class="crop-card-v2 h-100">
+                        <div class="card-content">
+                            <h4 class="fw-bold text-agro-primary mb-1">${c.name}</h4>
+                            <p class="text-muted small mb-3"><em>${c.scientific_name}</em></p>
+                            <p class="small text-muted mb-4 line-clamp-3">${c.description}</p>
+                            
+                            <div class="d-flex align-items-center gap-3 p-2 rounded-3 bg-light mb-3">
+                                <i class="bi bi-thermometer-half text-danger"></i>
+                                <span class="small">${c.min_temp}°C - ${c.max_temp}°C</span>
+                            </div>
+                        </div>
+                        <div class="card-footer-v2">
+                            <button onclick="showDetails('${id}')" class="btn btn-agro-primary w-100">Ver Ficha Técnica</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        let selectedCropForRedirect = '';
+        function showDetails(id) {
+            const c = window.CROP_CATALOG[id];
+            if (!c) return;
+            
+            selectedCropForRedirect = c.name;
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-agro-primary">${c.name}</h3>
+                    <p class="text-muted"><em>${c.scientific_name}</em></p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-4 h-100">
+                            <h6 class="fw-bold text-success mb-3">Condiciones Ideales</h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">🌡️ <strong>Temperatura:</strong> ${c.min_temp}°C a ${c.max_temp}°C</li>
+                                <li class="mb-2">💧 <strong>Humedad:</strong> ${c.min_humidity}% a ${c.max_humidity}%</li>
+                                <li class="mb-2">🌱 <strong>Suelo:</strong> ${c.soil_type}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-4 h-100">
+                            <h6 class="fw-bold text-success mb-3">Descripción Técnica</h6>
+                            <p class="small text-muted mb-0">${c.description}</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded-4">
+                            <h6 class="fw-bold text-primary mb-3">Calendario Automático de Abonado</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless align-middle mb-0">
+                                    <thead class="text-muted small">
+                                        <tr>
+                                            <th>Día</th>
+                                            <th>Producto</th>
+                                            <th>Dosis</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${c.fertilizer_plan.map(p => `
+                                            <tr>
+                                                <td><span class="badge bg-white text-dark shadow-sm">Día ${p.day}</span></td>
+                                                <td class="small fw-bold">${p.product}</td>
+                                                <td class="text-muted small">${p.dose}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            new bootstrap.Modal(document.getElementById('cropModal')).show();
+        }
+
+        function redirectToRegister() {
+            window.location.href = `crop_create.html?preset=${encodeURIComponent(selectedCropForRedirect)}`;
+        }
+    </script>
+</body>
+</html>

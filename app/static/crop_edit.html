@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Cultivo</title>
+    <!-- Mismo JS para que mapee el html con query param -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const cropId = urlParams.get('id');
+        if(cropId && window.location.pathname.indexOf('crop_edit.html') > -1) {
+            window.location.replace('crop_create.html?id=' + cropId);
+        }
+    </script>
+</head>
+<body>
+    Redirigiendo...
+</body>
+</html>

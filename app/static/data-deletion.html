@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminación de Datos del Usuario - AgroSmart Corporation</title>
+    <meta name="description" content="Instrucciones oficiales para solicitar la eliminación y supresión de datos de usuario de AgroSmart Corporation y comunicaciones de WhatsApp Business Platform.">
+    <meta name="robots" content="index, follow">
+
+    <!-- CSS & Frameworks -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="css/modern_agro.css">
+
+    <style>
+        .hero-deletion {
+            background: linear-gradient(135deg, #065f46 0%, #047857 50%, #0f172a 100%);
+            color: white;
+            padding: 85px 0 55px;
+            border-bottom-left-radius: 36px;
+            border-bottom-right-radius: 36px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(6, 95, 70, 0.25);
+        }
+
+        .hero-deletion::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .legal-sidebar {
+            position: sticky;
+            top: 25px;
+            max-height: calc(100vh - 50px);
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 24px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+
+        .legal-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .legal-sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color, #10b981);
+            border-radius: 10px;
+        }
+
+        .nav-link-legal {
+            color: #4b5563;
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-bottom: 4px;
+        }
+
+        .nav-link-legal:hover,
+        .nav-link-legal.active {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            transform: translateX(3px);
+        }
+
+        .legal-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 35px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.03);
+            margin-bottom: 30px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .legal-card:hover {
+            box-shadow: 0 18px 40px rgba(16, 185, 129, 0.08);
+        }
+
+        .legal-section-title {
+            font-weight: 800;
+            color: #111827;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.25);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.35rem;
+        }
+
+        .legal-section-title i {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.12);
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+
+        .step-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #10b981;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+        }
+
+        .step-container {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 24px;
+            align-items: flex-start;
+        }
+
+        .placeholder-tag {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: monospace;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-meta-status {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-navbar-public {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        @media (max-width: 991px) {
+            .legal-sidebar {
+                position: relative;
+                top: 0;
+                max-height: none;
+                margin-bottom: 25px;
+            }
+
+            .legal-card {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-body">
+
+    <!-- Top Public Navigation Bar -->
+    <nav class="top-navbar-public py-3">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand text-decoration-none d-flex align-items-center gap-2" href="index.html">
+                <img src="img/logo.png" alt="AgroSmart Logo" style="height: 38px; width: auto; object-fit: contain;"
+                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Agro+Smart&background=10b981&color=fff';">
+                <span style="color: #111827; font-weight: 900; font-size: 1.3rem; letter-spacing: -0.5px;">AgroSmart</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="index.html" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold d-none d-sm-inline-flex align-items-center gap-1">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a href="privacy.html" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-dark">
+                    Política de Privacidad
+                </a>
+                <a href="terms.html" class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold text-dark d-none d-md-inline-flex">
+                    Términos de Servicio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Hero Section -->
+    <header class="hero-deletion text-center animate__animated animate__fadeIn">
+        <div class="container position-relative z-1">
+            <div class="mb-3">
+                <span class="badge-meta-status">
+                    <i class="bi bi-file-earmark-lock text-warning fs-6"></i>
+                    Instrucciones de Eliminación de Datos para Meta Developers
+                </span>
+            </div>
+            <h1 class="display-5 fw-bold mb-2">Eliminación de Datos del Usuario</h1>
+            <p class="lead opacity-90 mx-auto mb-3" style="max-width: 780px;">
+                Guía oficial paso a paso para solicitar la supresión de sus datos personales, número de WhatsApp y registros de actividades en AgroSmart Corporation.
+            </p>
+            <div class="small opacity-75 d-inline-flex align-items-center gap-2 bg-dark bg-opacity-25 px-3 py-1 rounded-pill">
+                <i class="bi bi-calendar-check"></i>
+                <span>Última actualización: <strong>12 de agosto de 2026</strong></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container my-5">
+        <div class="row g-4">
+
+            <!-- Sidebar Navigation / Table of Contents -->
+            <div class="col-lg-3">
+                <nav class="legal-sidebar">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3 px-2" style="letter-spacing: 0.5px;">
+                        Índice de la Guía
+                    </h6>
+                    <a href="#sec-compromiso" class="nav-link-legal active"><i class="bi bi-shield-check"></i> 1. Compromiso</a>
+                    <a href="#sec-como-solicitar" class="nav-link-legal"><i class="bi bi-send"></i> 2. Cómo Solicitar</a>
+                    <a href="#sec-info-requerida" class="nav-link-legal"><i class="bi bi-card-checklist"></i> 3. Datos Requeridos</a>
+                    <a href="#sec-proceso-plazos" class="nav-link-legal"><i class="bi bi-gear-wide-connected"></i> 4. Proceso y Plazos</a>
+                    <a href="#sec-excepciones" class="nav-link-legal"><i class="bi bi-journal-medical"></i> 5. Conservación Legal</a>
+                    <a href="#sec-contacto-soporte" class="nav-link-legal"><i class="bi bi-headset"></i> 6. Canales de Contacto</a>
+
+                    <hr class="my-3 border-secondary opacity-25">
+
+                    <div class="p-3 bg-light rounded-3 border small">
+                        <div class="fw-bold text-dark mb-1"><i class="bi bi-info-circle text-success me-1"></i> Documentos Oficiales</div>
+                        <ul class="list-unstyled m-0 ps-1" style="font-size: 0.85rem;">
+                            <li class="mb-1"><a href="privacy.html" class="text-decoration-none text-success fw-semibold">&rsaquo; Política de Privacidad</a></li>
+                            <li class="mb-1"><a href="terms.html" class="text-decoration-none text-success fw-semibold">&rsaquo; Términos de Servicio</a></li>
+                            <li><a href="soporte.html" class="text-decoration-none text-success fw-semibold">&rsaquo; Centro de Soporte</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-lg-9">
+
+                <!-- 1. Compromiso y Objetivo -->
+                <section id="sec-compromiso" class="legal-card animate__animated animate__fadeIn">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-shield-check"></i> 1. Compromiso de Supresión de Datos
+                    </h2>
+                    <p>
+                        En <strong>AgroSmart Corporation</strong> respetamos el derecho fundamental de cada usuario a controlar su información personal. Cualquier persona que haya interactuado con nuestros servicios web, completado un formulario de registro o enviado mensajes a través de nuestro canal de <strong>WhatsApp Business Platform</strong> tiene derecho a solicitar la eliminación completa o parcial de sus datos.
+                    </p>
+                    <div class="alert alert-info d-flex align-items-center gap-3 p-3 rounded-4 mb-0" style="background: rgba(13, 202, 240, 0.08); border-color: rgba(13, 202, 240, 0.3);">
+                        <i class="bi bi-info-circle-fill fs-3 text-info"></i>
+                        <div class="small">
+                            <strong>URL de Instrucciones para Meta Developers:</strong> Esta página constituye la documentación oficial para la configuración de <em>Data Deletion Request Instructions</em> en las aplicaciones vinculadas a la Meta Graph API y WhatsApp Cloud API de AgroSmart Corporation.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Cómo realizar la solicitud -->
+                <section id="sec-como-solicitar" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-send"></i> 2. Cómo Realizar la Solicitud de Eliminación
+                    </h2>
+                    <p>
+                        Para procesar la eliminación de su información sin intermediarios y con total seguridad, siga estos sencillos pasos:
+                    </p>
+
+                    <div class="step-container">
+                        <div class="step-badge">1</div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Envíe un correo electrónico formal de solicitud</h6>
+                            <p class="text-muted small m-0">
+                                Remita un mensaje a nuestra dirección de privacidad: <span class="placeholder-tag">[contacto@agrosmart.com]</span> con el asunto: <strong>«Solicitud de Eliminación de Datos - AgroSmart»</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-badge">2</div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Alternativa: Mensaje directo por WhatsApp</h6>
+                            <p class="text-muted small m-0">
+                                También puede enviar un mensaje directo al número oficial de soporte en WhatsApp escribiendo: <strong>«SOLICITO ELIMINAR MIS DATOS»</strong> para que un agente inicie el protocolo de atención manual.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step-container mb-0">
+                        <div class="step-badge">3</div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Formulario en el Centro de Soporte</h6>
+                            <p class="text-muted small m-0">
+                                Puede registrar un ticket desde nuestro <a href="soporte.html" class="text-success fw-bold text-decoration-none">Centro de Soporte</a> seleccionando la categoría de Privacidad y Derechos de Datos.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Información que debe proporcionar -->
+                <section id="sec-info-requerida" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-card-checklist"></i> 3. Información Requerida para Identificar sus Datos
+                    </h2>
+                    <p>
+                        Para localizar de forma precisa sus registros y asegurar que la solicitud proviene del legítimo titular, le solicitamos incluir los siguientes datos en su petición:
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-1"><i class="bi bi-whatsapp text-success me-2"></i>Número de Teléfono</h6>
+                                <p class="small text-muted m-0">El número completo con código de país (ej. <code>+503 7XXX-XXXX</code>, <code>+52 1 55 XXXX-XXXX</code>) desde el cual interactuó con AgroSmart.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-1"><i class="bi bi-person text-success me-2"></i>Nombre Completo</h6>
+                                <p class="small text-muted m-0">Nombre del titular de la cuenta o el nombre de perfil público visible en WhatsApp.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-1"><i class="bi bi-envelope text-success me-2"></i>Correo Electrónico (si aplica)</h6>
+                                <p class="small text-muted m-0">El correo con el que se registró en la plataforma web de AgroSmart (si cuenta con un usuario activo).</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-dark mb-1"><i class="bi bi-sliders text-success me-2"></i>Alcance Deseado</h6>
+                                <p class="small text-muted m-0">Especificar si desea: (a) Desuscribirse de recordatorios de WhatsApp, (b) Borrar historial de mensajes, o (c) Supresión total de la cuenta.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Qué ocurre después de recibir la solicitud -->
+                <section id="sec-proceso-plazos" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-gear-wide-connected"></i> 4. Qué Ocurre Después de Recibir su Solicitud
+                    </h2>
+                    <p>
+                        Una vez recibida su petición, nuestro equipo de soporte ejecuta el siguiente procedimiento:
+                    </p>
+
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <i class="bi bi-1-circle-fill fs-4 text-success flex-shrink-0"></i>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Acuse de Recibo y Validación de Identidad</h6>
+                                <p class="small text-muted m-0">En un plazo máximo de <strong>24 a 48 horas hábiles</strong> confirmaremos la recepción y verificaremos que la solicitud pertenezca al titular del número o cuenta mediante un mensaje de confirmación.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <i class="bi bi-2-circle-fill fs-4 text-success flex-shrink-0"></i>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Ejecución del Borrado Técnico</h6>
+                                <p class="small text-muted m-0">Se procede a la eliminación definitiva de los registros en la base de datos de Supabase, tablas de automatización n8n, colas de mensajes programados y listas de opt-in de WhatsApp.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-3-circle-fill fs-4 text-success flex-shrink-0"></i>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Confirmación Final y Código de Seguimiento</h6>
+                                <p class="small text-muted m-0">Se envía una notificación al usuario informando que la supresión de datos ha sido completada satisfactoriamente con su respectivo identificador de resolución.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="small text-muted m-0">
+                        <i class="bi bi-clock-history me-1"></i> El plazo total para completar la eliminación integral es de un máximo de <strong>15 a 30 días hábiles</strong> tras la verificación de la identidad.
+                    </p>
+                </section>
+
+                <!-- 5. Excepciones legales y conservación -->
+                <section id="sec-excepciones" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-journal-medical"></i> 5. Conservación de Datos por Obligaciones Legales
+                    </h2>
+                    <p>
+                        AgroSmart Corporation eliminará la totalidad de los datos personales salvo en aquellos casos puntuales en los que exista una obligación legal o técnica legítima que requiera conservar cierta información de forma restringida:
+                    </p>
+                    <ul>
+                        <li class="mb-2"><strong>Cumplimiento normativo y tributario:</strong> Conservación de comprobantes de facturación o transacciones comerciales durante los plazos fiscales exigidos por la legislación aplicable.</li>
+                        <li class="mb-2"><strong>Seguridad y prevención de fraudes:</strong> Metadatos mínimos de auditoría técnica y prevención de abusos en la infraestructura.</li>
+                        <li class="mb-2"><strong>Respaldos temporales:</strong> Los respaldos automatizados de seguridad (backups) rotan y se sobreescriben periódicamente, purgando automáticamente la información eliminada.</li>
+                    </ul>
+                    <p class="small text-muted m-0">
+                        En ningún caso estos datos retenidos legalmente serán utilizados para fines comerciales o de comunicación con el usuario.
+                    </p>
+                </section>
+
+                <!-- 6. Canales de Contacto Directo -->
+                <section id="sec-contacto-soporte" class="legal-card">
+                    <h2 class="legal-section-title">
+                        <i class="bi bi-headset"></i> 6. Canales de Atención para Eliminación de Datos
+                    </h2>
+                    <p>
+                        Para gestionar su solicitud o resolver dudas adicionales sobre este procedimiento, comuníquese con nosotros:
+                    </p>
+                    <div class="p-3 border rounded-3 bg-light mb-3">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-envelope-check fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Correo para Solicitudes de Eliminación:</div>
+                                <div><span class="placeholder-tag">[contacto@agrosmart.com]</span></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-telephone fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Teléfono / WhatsApp de Atención:</div>
+                                <div><span class="placeholder-tag">[+503 0000-0000 / Línea de Privacidad]</span></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-globe fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Portal de AgroSmart Corporation:</div>
+                                <div><a href="index.html" class="text-success text-decoration-none fw-semibold">https://atlasdigitalsv-max.github.io/AgroSmart-Corporation/</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Navigation buttons -->
+                <div class="text-center my-4">
+                    <a href="index.html" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold me-2">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al Portal Principal
+                    </a>
+                    <a href="privacy.html" class="btn btn-agro-primary rounded-pill px-4 py-2 fw-semibold text-white">
+                        <i class="bi bi-shield-check me-1"></i> Consultar Política de Privacidad
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white py-4 border-top mt-5">
+        <div class="container text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-3 small">
+                <a href="index.html" class="text-muted text-decoration-none">Inicio</a> &bull;
+                <a href="about.html" class="text-muted text-decoration-none">Nosotros</a> &bull;
+                <a href="privacy.html" class="text-muted text-decoration-none">Política de Privacidad</a> &bull;
+                <a href="data-deletion.html" class="text-success fw-bold text-decoration-none">Eliminación de Datos</a> &bull;
+                <a href="terms.html" class="text-muted text-decoration-none">Términos de Servicio</a> &bull;
+                <a href="soporte.html" class="text-muted text-decoration-none">Soporte</a>
+            </div>
+            <p class="text-muted small m-0">&copy; 2026 AgroSmart Corporation. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll spy for sidebar links
+            const navLinks = document.querySelectorAll('.nav-link-legal');
+            const sections = document.querySelectorAll('.legal-card');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(sec => {
+                    const secTop = sec.offsetTop;
+                    if (window.pageYOffset >= (secTop - 160)) {
+                        current = sec.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

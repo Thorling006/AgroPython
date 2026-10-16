@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroRed - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <style>
+        .agrored-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr 300px;
+            gap: 24px;
+            align-items: start;
+            margin-top: 20px;
+        }
+        @media (max-width: 991px) {
+            .agrored-layout {
+                grid-template-columns: 1fr;
+            }
+            .agrored-sidebar-left, .agrored-sidebar-right {
+                display: none;
+            }
+        }
+        
+        .agrored-sidebar-left .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+        .agrored-sidebar-left .nav-item:hover, .agrored-sidebar-left .nav-item.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--agro-primary);
+        }
+        .agrored-sidebar-left .nav-item i {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+        .agrored-sidebar-left .nav-item:hover i, .agrored-sidebar-left .nav-item.active i {
+            color: var(--agro-primary);
+        }
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--agro-primary);
+            text-transform: uppercase;
+            margin: 25px 0 10px 15px;
+            letter-spacing: 0.5px;
+        }
+        .topic-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .topic-item:hover {
+            background: rgba(0,0,0,0.03);
+        }
+        .topic-icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--agro-primary);
+            font-size: 0.85rem;
+        }
+
+        .post-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            object-fit: cover;
+        }
+        .compose-post {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+        .compose-input {
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            width: 100%;
+            resize: none;
+            outline: none;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+        .compose-input::placeholder {
+            color: #94a3b8;
+        }
+        .compose-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .compose-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .compose-btn:hover {
+            background: rgba(0,0,0,0.04);
+            color: var(--text-main);
+        }
+        .btn-create-post {
+            background: var(--agro-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-left: auto;
+            transition: opacity 0.3s;
+        }
+        .btn-create-post:hover {
+            opacity: 0.9;
+        }
+
+        .sidebar-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+        .sidebar-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--agro-primary);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-section-title span.link {
+            color: #94a3b8;
+            text-transform: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .forum-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .forum-item:last-child {
+            margin-bottom: 0;
+        }
+        .forum-icon {
+            color: var(--agro-primary);
+            font-size: 1.4rem;
+        }
+        .forum-details h6 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .forum-details small {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .community-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .community-item:last-child {
+            margin-bottom: 0;
+        }
+        .community-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .community-info h6 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .community-info small {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .btn-add-community {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--agro-primary);
+            background: transparent;
+            color: var(--agro-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .btn-add-community:hover {
+            background: var(--agro-primary);
+            color: white;
+        }
+        .support-peer-card {
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            position: relative;
+        }
+        .support-peer-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        .support-peer-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        .support-avatars {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .support-avatars img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-left: -10px;
+        }
+        .support-avatars img:first-child {
+            margin-left: 0;
+        }
+        .support-avatars .more-count {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: var(--agro-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: -10px;
+        }
+        .btn-ask {
+            width: 100%;
+            background: var(--agro-primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .btn-ask:hover {
+            opacity: 0.9;
+        }
+        .icon-bubble {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: var(--agro-primary);
+            opacity: 0.5;
+        }
+        
+        .post-image-full {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        .post-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--agro-primary);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-btn:hover {
+            color: var(--agro-primary);
+        }
+
+    </style>
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container animate-slide-up" style="max-width: 1300px;">
+        <div class="agrored-layout">
+            
+            <!-- Sidebar Izquierda: Navegación -->
+            <div class="agrored-sidebar-left">
+                <a href="javascript:void(0)" class="nav-item active" onclick="window.scrollTo(0,0); loadFeed();"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                <a href="javascript:void(0)" class="nav-item" onclick="openFriendsModal()"><i class="bi bi-people"></i> Mis Amigos</a>
+                <a href="javascript:void(0)" class="nav-item" onclick="openFriendsModal()"><i class="bi bi-chat-dots"></i> Mensajes</a>
+                <a href="javascript:void(0)" class="nav-item" onclick="Toast.fire({icon: 'info', title: 'No tienes notificaciones nuevas'})"><i class="bi bi-bell"></i> Notificaciones</a>
+            </div>
+
+            <!-- Feed Central -->
+            <div class="agrored-feed">
+                <!-- Compose Post -->
+                <div class="compose-post">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div id="my-avatar" class="post-avatar">U</div>
+                        <input id="post-input" class="compose-input" placeholder="¿Qué quieres compartir hoy?">
+                    </div>
+                    <div class="compose-actions">
+                        <input type="file" id="post-image-input" accept="image/*" style="display: none;" onchange="handlePostImageSelect(event)">
+                        <button class="compose-btn" onclick="document.getElementById('post-image-input').click()">
+                            <i class="bi bi-image" style="color:#64748b;"></i> Foto / Video
+                        </button>
+                        <button class="compose-btn" onclick="composeSpecialPost('Pregunta')"><i class="bi bi-chat-left-text" style="color:#64748b;"></i> Pregunta</button>
+                        <button class="compose-btn" onclick="composeSpecialPost('Artículo')"><i class="bi bi-file-text" style="color:#64748b;"></i> Artículo</button>
+                        <button class="compose-btn" onclick="composeSpecialPost('Encuesta')"><i class="bi bi-bar-chart" style="color:#64748b;"></i> Encuesta</button>
+                        <button class="btn-create-post" id="btn-publish" onclick="publishPost()">Crear publicación</button>
+                    </div>
+                    <div id="post-image-preview-container" class="mt-2" style="display:none;">
+                        <span id="post-image-preview" class="small text-success fw-bold"><i class="bi bi-check-circle"></i> Imagen Lista</span>
+                        <button class="btn btn-sm btn-outline-danger ms-2" id="post-image-remove" style="padding: 2px 6px; font-size: 10px; border-radius: 50%;" onclick="removePostImage()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Feed Wall -->
+                <div id="feed-wall">
+                    <div class="text-center p-5 text-muted">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">Cargando publicaciones...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Derecha: Widgets -->
+            <div class="agrored-sidebar-right">
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Foros Destacados <span class="link" onclick="createNewForum()">+ Crear</span></div>
+                    <div id="forums-list-container">
+                        <div class="text-center small text-muted">Cargando foros...</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Comunidades por Rubro <span class="link">Ver todas</span></div>
+                    <div id="communities-list-container">
+                        <div class="text-center small text-muted">Cargando comunidades...</div>
+                    </div>
+                </div>
+
+                <div class="support-peer-card">
+                    <i class="bi bi-chat-right-quote icon-bubble"></i>
+                    <div class="sidebar-section-title m-0 mb-2">Soporte Peer-to-Peer</div>
+                    <div class="support-peer-title">¿Tienes una duda?</div>
+                    <div class="support-peer-desc">La comunidad está aquí para ayudarte.</div>
+                    <div class="support-avatars" id="peer-support-avatars">
+                        <!-- Generado via JS -->
+                    </div>
+                    <button class="btn-ask" onclick="window.location.href='soporte.html'">Hacer una pregunta</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Amigos -->
+    <div class="modal fade" id="friendsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-main">Mis Amigos</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-sm btn-outline-primary rounded-pill py-1 px-3" onclick="openAddFriendModal()">+ Buscar Amigos</button>
+            </div>
+            <div id="friends-list" style="max-height: 300px; overflow-y: auto;">
+                <!-- Generado via JS -->
+            </div>
+            <hr>
+            <h6 class="fw-bold mb-3 text-muted" style="font-size: 0.8rem;">Solicitudes Pendientes</h6>
+            <div id="friend-requests-list">
+                <!-- Generado via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+        let currentUser = null;
+        let allUsersCache = [];
+
+        const ADS_POOL = [
+            {
+                title: "Fertilizante NPK 15-15-15 Premium",
+                desc: "Potencia el crecimiento y rendimiento de tus cultivos con Amazon Agro. Envío gratis.",
+                img: "https://images.unsplash.com/photo-1628186121487-73d2a71d1c14?auto=format&fit=crop&q=80&w=200",
+                link: "#"
+            },
+            {
+                title: "Abono Orgánico Compostado 50kg",
+                desc: "Ideal para hortalizas y frutales. Recupera la salud de tu suelo hoy.",
+                img: "https://images.unsplash.com/photo-1596701026362-e64e525164d1?auto=format&fit=crop&q=80&w=200",
+                link: "#"
+            },
+            {
+                title: "Fungicida y Fertilizante Foliar 2en1",
+                desc: "Protege tu siembra de plagas mientras nutres las hojas directamente.",
+                img: "https://images.unsplash.com/photo-1592982537447-6f2c3c6f966d?auto=format&fit=crop&q=80&w=200",
+                link: "#"
+            }
+        ];
+
+        let pendingBase64Image = null;
+
+        function handlePostImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Comprimir la imagen usando Canvas
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600; // Reducir ancho máximo para ahorrar BD
+                    const MAX_HEIGHT = 600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Comprimir a JPEG con calidad 0.6 (60%)
+                    pendingBase64Image = canvas.toDataURL('image/jpeg', 0.6);
+                    
+                    document.getElementById('post-image-preview').style.display = 'inline-block';
+                    document.getElementById('post-image-remove').style.display = 'inline-block';
+                };
+            };
+        }
+
+        function removePostImage() {
+            pendingBase64Image = null;
+            document.getElementById('post-image-input').value = '';
+            document.getElementById('post-image-preview').style.display = 'none';
+            document.getElementById('post-image-remove').style.display = 'none';
+        }
+
+        async function initAgroRed() {
+            await window.initLayout('agrored');
+            await AuthObj.requireAuth();
+            currentUser = await AuthObj.getCurrentUser();
+            
+            // Plan Security Check for AgroRed
+            if (currentUser.role !== 'global_owner') {
+                const countries = await window.DB.getCountries();
+                const country = countries.find(c => String(c.id) === String(currentUser.country_id));
+                const plan = country ? (country.plan || 'none').toLowerCase() : 'none';
+                
+                if (!['platinium', 'diamante', 'esmeralda'].includes(plan)) {
+                    if (typeof Swal !== 'undefined') {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Acceso Denegado',
+                            text: 'AgroRed es una característica exclusiva de los planes Platinium, Diamante y Esmeralda.',
+                            confirmButtonColor: '#10b981'
+                        });
+                    } else {
+                        alert('Acceso Denegado. Requiere plan Platinium o superior.');
+                    }
+                    window.location.replace('dashboard.html');
+                    return;
+                }
+            }
+
+            allUsersCache = await window.DB.getAllUsers();
+
+            // Set my avatar
+            const myAvatar = document.getElementById('my-avatar');
+            if (currentUser.avatar_url) {
+                myAvatar.innerHTML = `<img src="${currentUser.avatar_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            } else {
+                myAvatar.textContent = (currentUser.full_name || currentUser.email).charAt(0).toUpperCase();
+            }
+
+            loadFeed();
+            loadFeed();
+            // loadGroups(); eliminado para corregir error
+            loadFriends();
+            loadDynamicWidgets();
+            
+            // Poll for updates
+            setInterval(loadFeed, 10000);
+            setInterval(loadFriends, 15000);
+            setInterval(loadDynamicWidgets, 30000);
+        }
+
+        function escapeHTML(str) {
+            return (str || '').replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        function getAvatarHtml(user) {
+            if (user && user.avatar_url) {
+                return `<img src="${user.avatar_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            }
+            return (user?.full_name || user?.email || 'U').charAt(0).toUpperCase();
+        }
+
+        async function publishPost() {
+            const input = document.getElementById('post-input');
+            const content = input.value.trim();
+            if (!content && !pendingBase64Image) return;
+            
+            try {
+                input.disabled = true;
+                const postBtn = document.getElementById('btn-publish');
+                postBtn.disabled = true;
+                postBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+                await window.DB.createPost(currentUser.id, content, pendingBase64Image);
+                
+                input.value = '';
+                removePostImage();
+                await loadFeed();
+                Toast.fire({ icon: 'success', title: 'Publicado con éxito' });
+            } catch(e) {
+                window.showErrorModal('Error', 'No se pudo publicar: ' + e.message);
+            } finally {
+                input.disabled = false;
+                const postBtn = document.getElementById('btn-publish');
+                postBtn.disabled = false;
+                postBtn.innerHTML = 'Crear publicación';
+            }
+        }
+
+        async function likePost(postId) {
+            let likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+            if (likedPosts.includes(postId)) return;
+
+            try {
+                await window.DB.likePost(postId);
+                
+                // Guardar en local storage para prevenir doble like en recarga
+                likedPosts.push(postId);
+                localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+
+                // Optimistic UI update
+                const btn = document.getElementById(`like-btn-${postId}`);
+                if (btn) {
+                    const countSpan = btn.querySelector('.like-count');
+                    countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                    btn.classList.replace('text-muted', 'text-danger');
+                    btn.querySelector('i').classList.replace('bi-heart', 'bi-heart-fill');
+                    btn.disabled = true;
+                }
+            } catch(e) {
+                console.warn("AgroRed warning:", e);
+            }
+        }
+
+        async function loadFeed() {
+            const posts = await window.DB.getPosts();
+            const container = document.getElementById('feed-wall');
+            let html = '';
+
+            if (posts.length === 0) {
+                html = `<div class="text-center p-5 text-muted">Aún no hay publicaciones. ¡Sé el primero en compartir algo!</div>`;
+            } else {
+                let postCount = 0;
+                
+                for (const post of posts) {
+                    const u = post.users || allUsersCache.find(x => x.id === post.user_id) || {};
+                    const isGlobalOwner = u.role === 'global_owner';
+                    const badge = isGlobalOwner ? `<i class="bi bi-patch-check-fill text-primary" title="Verificado"></i>` : '';
+                    
+                    const timeAgo = new Date(post.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+                    const isMyPost = post.user_id === currentUser.id || currentUser.role === 'global_owner';
+                    
+                    let postOptions = '';
+                    if (isMyPost) {
+                        postOptions = `
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted p-0 text-decoration-none" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                    <li><button class="dropdown-item small" onclick="editPost(${post.id}, '${escapeHTML(post.content).replace(/'/g, "\\'")}')"><i class="bi bi-pencil me-2"></i>Editar</button></li>
+                                    <li><button class="dropdown-item small text-danger" onclick="deletePost(${post.id})"><i class="bi bi-trash me-2"></i>Eliminar</button></li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    const comments = await window.DB.getPostComments(post.id);
+                    let commentsHtml = '';
+                    comments.forEach(c => {
+                        const cu = c.users || allUsersCache.find(x => x.id === c.user_id) || {};
+                        commentsHtml += `
+                            <div class="d-flex gap-2 mb-2">
+                                <div style="width:25px; height:25px; font-size:10px;" class="post-avatar shadow-sm border overflow-hidden p-0 flex-shrink-0">${getAvatarHtml(cu)}</div>
+                                <div class="bg-light p-2 rounded-3 flex-grow-1" style="font-size: 13px;">
+                                    <div class="fw-bold text-main" style="font-size:11px;">${escapeHTML(cu.full_name || cu.email)}</div>
+                                    ${escapeHTML(c.content)}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+                    const isLiked = likedPosts.includes(post.id);
+                    const heartIcon = isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
+                    const heartColor = isLiked ? 'text-primary' : '#64748b';
+
+                    // Mock topic generator for visual effect
+                    const topics = ['Maíz', 'Café', 'Horticultura', 'Riego', 'General'];
+                    const randomTopic = topics[post.id % topics.length];
+
+                    let postBodyHtml = '';
+                    if (post.content.startsWith('📊')) {
+                        try {
+                            const lines = post.content.split('\\n').map(l => l.trim()).filter(l => l);
+                            const question = lines[0].replace('📊', '').trim();
+                            const options = lines.filter(l => l.startsWith('🔘')).map(l => l.replace('🔘', '').trim());
+                            
+                            const votes = await window.DB.getPollVotes(post.id);
+                            const totalVotes = votes.length;
+                            const myVote = votes.find(v => v.user_id === currentUser.id);
+
+                            postBodyHtml = `<div class="fw-bold mb-3" style="font-size: 1.1rem; color:var(--text-main);">📊 ${escapeHTML(question)}</div>`;
+                            postBodyHtml += `<div class="poll-container d-flex flex-column gap-2 mb-2">`;
+                            
+                            options.forEach((opt, idx) => {
+                                const optVotes = votes.filter(v => v.option_index === idx).length;
+                                const percent = totalVotes > 0 ? Math.round((optVotes / totalVotes) * 100) : 0;
+                                
+                                if (myVote) {
+                                    postBodyHtml += `
+                                        <div class="poll-option-result position-relative" style="background:var(--bg-light); border-radius:6px; overflow:hidden; border:1px solid ${myVote.option_index===idx?'var(--primary-color)':'var(--border-color)'};">
+                                            <div class="position-absolute h-100" style="background:${myVote.option_index===idx?'#d1fae5':'#e2e8f0'}; width:${percent}%; z-index:1; left:0; top:0;"></div>
+                                            <div class="position-relative d-flex justify-content-between p-2" style="z-index:2; font-size:0.9rem;">
+                                                <span>${escapeHTML(opt)} ${myVote.option_index===idx?'<i class="bi bi-check-circle-fill text-success"></i>':''}</span>
+                                                <span class="fw-bold" style="color:var(--text-main);">${percent}%</span>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else {
+                                    postBodyHtml += `<button class="btn btn-outline-secondary text-start w-100 p-2 border-1" onclick="castPollVote(${post.id}, ${idx})" style="border-radius:6px; font-size:0.9rem; color:var(--text-main);">${escapeHTML(opt)}</button>`;
+                                }
+                            });
+                            postBodyHtml += `</div>`;
+                            postBodyHtml += `<div class="small text-muted mb-2">${totalVotes} votos • <a href="javascript:void(0)" onclick="showPollVoters(${post.id})" class="text-decoration-none">Ver votantes</a></div>`;
+
+                        } catch(e) {
+                            postBodyHtml = escapeHTML(post.content).replace(/\\n/g, '<br>');
+                        }
+                    } else {
+                        postBodyHtml = escapeHTML(post.content).replace(/\\n/g, '<br>');
+                    }
+
+                    if (post.image_url) {
+                        postBodyHtml += `<div class="mt-3"><img src="${post.image_url}" class="post-image-full" alt="Post image"></div>`;
+                    }
+
+                    html += `
+                        <div class="post-card">
+                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="post-avatar shadow-sm" style="overflow:hidden; padding:0; border:1px solid var(--border-color);">${getAvatarHtml(u)}</div>
+                                    <div>
+                                        <div class="fw-bold mb-0" style="color:var(--text-main); font-size: 0.95rem;">${escapeHTML(u.full_name || u.email)} ${badge}</div>
+                                        <div class="text-muted" style="font-size: 0.8rem;">Productor • ${randomTopic} • ${timeAgo}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 align-items-center">
+                                    ${postOptions || '<button class="btn btn-link text-muted p-0 text-decoration-none"><i class="bi bi-three-dots"></i></button>'}
+                                </div>
+                            </div>
+                            <div class="post-body mb-3" style="font-size: 0.95rem; line-height: 1.5; color: var(--text-main);">
+                                ${postBodyHtml}
+                            </div>
+                            <div class="post-actions border-top pt-3 d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-4">
+                                    <button id="like-btn-${post.id}" class="action-btn" style="color: ${heartColor};" onclick="likePost(${post.id})" ${isLiked ? 'disabled' : ''}>
+                                        <i class="bi ${heartIcon}"></i> <span class="like-count">${post.likes_count || 0}</span>
+                                    </button>
+                                    <button class="action-btn" onclick="toggleComments(${post.id})">
+                                        <i class="bi bi-chat"></i> ${comments.length}
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="bi bi-share"></i> Compartir
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Comments Section -->
+                            <div id="comments-${post.id}" class="mt-3 pt-3 border-top" style="display:none;">
+                                ${commentsHtml}
+                                <div class="d-flex gap-2 mt-2">
+                                    <div style="width:25px; height:25px; font-size:10px;" class="post-avatar shadow-sm border overflow-hidden p-0 flex-shrink-0">${getAvatarHtml(currentUser)}</div>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" id="comment-input-${post.id}" class="form-control" placeholder="Escribe un comentario..." onkeypress="if(event.key === 'Enter') submitComment(${post.id})">
+                                        <button class="btn btn-outline-success" type="button" onclick="submitComment(${post.id})">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    postCount++;
+
+                    // Inject AD every 3 posts
+                    if (postCount % 3 === 0) {
+                        const ad = ADS_POOL[(postCount / 3) % ADS_POOL.length];
+                        html += `
+                            <div class="ad-card">
+                                <img src="${ad.img}" class="ad-img" alt="Ad">
+                                <div>
+                                    <span class="badge bg-warning text-dark mb-1" style="font-size:0.6rem;">Patrocinado</span>
+                                    <h6 class="fw-bold mb-1">${ad.title}</h6>
+                                    <p class="small text-muted mb-0" style="line-height:1.2;">${ad.desc}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            container.innerHTML = html;
+        }
+
+        window.openFriendsModal = function() {
+            const myModal = new bootstrap.Modal(document.getElementById('friendsModal'));
+            myModal.show();
+        };
+
+        async function loadDynamicWidgets() {
+            // Load Peer Avatars
+            if (allUsersCache.length > 0) {
+                const peers = allUsersCache.filter(u => u.id !== currentUser.id && u.avatar_url).slice(0, 4);
+                let avatarsHtml = '';
+                peers.forEach(p => {
+                    avatarsHtml += `<img src="${p.avatar_url}" style="object-fit:cover;" title="${escapeHTML(p.full_name)}">`;
+                });
+                if (allUsersCache.length > 4) {
+                    avatarsHtml += `<div class="more-count">+${allUsersCache.length - 4}</div>`;
+                }
+                document.getElementById('peer-support-avatars').innerHTML = avatarsHtml;
+            }
+
+            // Load Forums
+            try {
+                const forums = await window.DB.getForums();
+                let fHtml = '';
+                if (forums.length === 0) fHtml = '<div class="text-muted small p-2">No hay foros aún. ¡Crea uno!</div>';
+                
+                for(let f of forums) {
+                    const count = await window.DB.getForumPostsCount(f.id);
+                    fHtml += `
+                    <div class="forum-item">
+                        <i class="bi bi-chat-square-dots forum-icon"></i>
+                        <div class="forum-details">
+                            <h6>${escapeHTML(f.name)}</h6>
+                            <small>${count} publicaciones</small>
+                        </div>
+                    </div>`;
+                }
+                document.getElementById('forums-list-container').innerHTML = fHtml;
+            } catch(e) { console.warn("No forums table"); }
+
+            // Load Communities
+            try {
+                const communities = await window.DB.getCommunities();
+                let cHtml = '';
+                for(let c of communities) {
+                    const membersCount = await window.DB.getCommunityMembersCount(c.id);
+                    cHtml += `
+                    <div class="community-item">
+                        <div class="community-info">
+                            <div class="topic-icon" style="width:35px;height:35px;font-size:1rem;display:flex;align-items:center;justify-content:center;">${c.icon || '🌱'}</div>
+                            <div>
+                                <h6>${escapeHTML(c.name)}</h6>
+                                <small>${membersCount} miembros</small>
+                            </div>
+                        </div>
+                        <button class="btn-add-community" onclick="joinCommunityBtn(${c.id})" title="Unirse"><i class="bi bi-plus"></i></button>
+                    </div>`;
+                }
+                document.getElementById('communities-list-container').innerHTML = cHtml || '<div class="text-muted small p-2">No hay comunidades.</div>';
+            } catch(e) { console.warn("No communities table"); }
+        }
+
+        window.joinCommunityBtn = async function(id) {
+            try {
+                await window.DB.joinCommunity(id, currentUser.id);
+                Toast.fire({icon: 'success', title: 'Te has unido a la comunidad'});
+                loadDynamicWidgets();
+            } catch(e) { window.showErrorModal('Error', 'No pudiste unirte: ' + e.message); }
+        };
+
+        window.createNewForum = async function() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Crear Foro',
+                html: `
+                    <input id="swal-f-name" class="swal2-input m-0 w-100 mb-3" placeholder="Nombre del Foro (Ej: Productores de Cacao)">
+                    <textarea id="swal-f-desc" class="swal2-textarea m-0 w-100 p-2" rows="2" placeholder="Descripción breve..."></textarea>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Crear Foro',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-f-name').value.trim();
+                    if(!name) { Swal.showValidationMessage('Nombre requerido'); return false; }
+                    return { name, desc: document.getElementById('swal-f-desc').value.trim() };
+                }
+            });
+            if (formValues) {
+                try {
+                    await window.DB.createForum(formValues.name, formValues.desc, currentUser.id);
+                    Toast.fire({icon: 'success', title: 'Foro creado exitosamente'});
+                    loadDynamicWidgets();
+                } catch(e) {
+                    window.showErrorModal('Error', 'No se pudo crear: ' + e.message);
+                }
+            }
+        };
+
+        window.deletePost = async function(id) {
+            const confirmed = await Swal.fire({
+                title: '¿Eliminar publicación?',
+                text: "No podrás revertir esto.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: 'var(--primary-color)',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+            if (confirmed.isConfirmed) {
+                try {
+                    await window.DB.deletePost(id);
+                    await loadFeed();
+                    Toast.fire({ icon: 'success', title: 'Publicación eliminada' });
+                } catch(e) { window.showErrorModal('Error', e.message); }
+            }
+        };
+
+        window.editPost = async function(id, currentContent) {
+            const { value: text } = await Swal.fire({
+                title: 'Editar publicación',
+                input: 'textarea',
+                inputValue: currentContent,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar'
+            });
+            if (text && text.trim() !== '') {
+                try {
+                    await window.DB.updatePost(id, text.trim());
+                    await loadFeed();
+                    Toast.fire({ icon: 'success', title: 'Publicación actualizada' });
+                } catch(e) { window.showErrorModal('Error', e.message); }
+            }
+        };
+
+        window.toggleComments = function(postId) {
+            const container = document.getElementById(`comments-${postId}`);
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        };
+
+        window.submitComment = async function(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+            try {
+                input.disabled = true;
+                await window.DB.createPostComment(postId, currentUser.id, text);
+                input.value = '';
+                await loadFeed();
+                // Re-open comments section
+                document.getElementById(`comments-${postId}`).style.display = 'block';
+            } catch(e) {
+                console.warn("AgroRed warning:", e);
+                window.showErrorModal('Error', 'No se pudo comentar.');
+            } finally {
+                input.disabled = false;
+            }
+        };
+
+        async function loadGroups() {
+            const container = document.getElementById('org-groups-list');
+            const groups = await window.DB.getUserGroups(currentUser.id);
+            
+            if (groups.length === 0) {
+                container.innerHTML = `<div class="text-muted small text-center p-3">No perteneces a ninguna cooperativa/grupo activo.</div>`;
+                return;
+            }
+
+            let html = '';
+            for (const g of groups) {
+                html += `
+                    <a href="chat_detail.html?group_id=${g.id}" class="friend-item">
+                        <div class="post-avatar" style="width:35px;height:35px;font-size:0.9rem;background:var(--secondary-color);color:var(--primary-color);">👥</div>
+                        <div class="text-truncate fw-bold" style="font-size: 14px;">${escapeHTML(g.name)}</div>
+                    </a>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        async function loadFriends() {
+            const friendships = await window.DB.getFriendships(currentUser.id);
+            const friendsContainer = document.getElementById('friends-list');
+            const requestsContainer = document.getElementById('friend-requests-list');
+
+            let friendsHtml = '';
+            let requestsHtml = '';
+
+            for (const f of friendships) {
+                const otherUserId = f.user_id1 === currentUser.id ? f.user_id2 : f.user_id1;
+                const otherUser = allUsersCache.find(u => u.id === otherUserId);
+                if (!otherUser) continue;
+
+                const name = escapeHTML(otherUser.full_name || otherUser.email);
+
+                if (f.status === 'accepted') {
+                    // It's a friend
+                    friendsHtml += `
+                        <div class="friend-item d-flex align-items-center position-relative">
+                            <a href="chat_detail.html?id=${otherUser.id}" class="d-flex align-items-center gap-2 text-decoration-none flex-grow-1 text-main">
+                                <div class="post-avatar shadow-sm" style="width:35px;height:35px;font-size:0.9rem;border:1px solid var(--border-color);">${getAvatarHtml(otherUser)}</div>
+                                <div class="text-truncate" style="font-size: 14px;">${name}</div>
+                            </a>
+                            <button class="btn btn-link text-danger p-0 ms-2" onclick="removeFriend(${f.id})" title="Eliminar amigo">
+                                <i class="bi bi-person-x"></i>
+                            </button>
+                        </div>
+                    `;
+                } else if (f.status === 'pending' && f.user_id2 === currentUser.id) {
+                    // Incoming request
+                    requestsHtml += `
+                        <div class="d-flex align-items-center gap-2 mb-2 p-2 border rounded bg-light">
+                            <div class="post-avatar" style="width:30px;height:30px;font-size:0.8rem;">${getAvatarHtml(otherUser)}</div>
+                            <div class="text-truncate small flex-grow-1">${name}</div>
+                            <button class="btn btn-sm btn-primary py-0 px-2 rounded-pill" onclick="acceptFriend(${f.id})">Aceptar</button>
+                        </div>
+                    `;
+                }
+            }
+
+            friendsContainer.innerHTML = friendsHtml || '<div class="text-muted small text-center p-2">Aún no tienes amigos añadidos.</div>';
+            requestsContainer.innerHTML = requestsHtml || '<div class="text-muted small text-center">No hay solicitudes</div>';
+        }
+
+        window.openAddFriendModal = async function() {
+            // Find users who are not me and not already friends/pending
+            const friendships = await window.DB.getFriendships(currentUser.id);
+            const existingIds = friendships.map(f => f.user_id1 === currentUser.id ? f.user_id2 : f.user_id1);
+            
+            const potentialFriends = allUsersCache.filter(u => u.id !== currentUser.id && !existingIds.includes(u.id));
+
+            let html = '';
+            if (potentialFriends.length === 0) {
+                html = '<p class="text-muted p-3">No hay usuarios nuevos sugeridos en tu región.</p>';
+            } else {
+                potentialFriends.forEach(u => {
+                    html += `
+                        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="post-avatar" style="width:30px;height:30px;font-size:0.8rem;">${getAvatarHtml(u)}</div>
+                                <span class="small fw-bold">${escapeHTML(u.full_name || u.email)}</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill py-0" onclick="sendRequest(${u.id}, this)">Agregar</button>
+                        </div>
+                    `;
+                });
+            }
+
+            Swal.fire({
+                title: 'Buscar Agricultores',
+                html: `<div style="max-height: 300px; overflow-y: auto;" class="text-start">${html}</div>`,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: 'Cerrar'
+            });
+        };
+
+        window.sendRequest = async function(userId, btnElement) {
+            try {
+                btnElement.disabled = true;
+                btnElement.textContent = "Enviado";
+                await window.DB.sendFriendRequest(currentUser.id, userId);
+                loadFriends();
+            } catch(e) {
+                window.showErrorModal('Error', e.message);
+                btnElement.disabled = false;
+                btnElement.textContent = "Agregar";
+            }
+        };
+
+        window.acceptFriend = async function(friendshipId) {
+            try {
+                await window.DB.acceptFriendRequest(friendshipId);
+                loadFriends();
+                Toast.fire({ icon: 'success', title: '¡Amistad aceptada!' });
+            } catch(e) {
+                window.showErrorModal('Error', 'No se pudo aceptar la solicitud.');
+            }
+        };
+
+        window.removeFriend = async function(friendshipId) {
+            const confirmed = await Swal.fire({
+                title: '¿Eliminar amigo?',
+                text: "Esta acción borrará también el historial de chat con esta persona.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: 'var(--primary-color)',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (confirmed.isConfirmed) {
+                try {
+                    await window.DB.deleteFriendship(friendshipId);
+                    loadFriends();
+                    Toast.fire({ icon: 'success', title: 'Amigo eliminado' });
+                } catch (e) {
+                    window.showErrorModal('Error', 'No se pudo eliminar al amigo: ' + e.message);
+                }
+            }
+        };
+
+        window.composeSpecialPost = async function(type) {
+            let config = {};
+            if (type === 'Pregunta') {
+                config = { title: 'Haz una Pregunta', input: 'textarea', inputPlaceholder: '¿Cuál es tu duda agrícola?', inputAttributes: {rows: 3} };
+            } else if (type === 'Artículo') {
+                config = { title: 'Escribir Artículo', input: 'textarea', inputPlaceholder: 'Escribe el contenido de tu artículo...', inputAttributes: {rows: 6} };
+            } else if (type === 'Encuesta') {
+                config = { title: 'Crear Encuesta', html: '<input id="enc-q" class="swal2-input" placeholder="Pregunta de la encuesta"><input id="enc-o1" class="swal2-input" placeholder="Opción 1"><input id="enc-o2" class="swal2-input" placeholder="Opción 2">', preConfirm: () => {
+                    const q = document.getElementById('enc-q').value;
+                    const o1 = document.getElementById('enc-o1').value;
+                    const o2 = document.getElementById('enc-o2').value;
+                    if(!q || !o1 || !o2) Swal.showValidationMessage('Todos los campos son obligatorios');
+                    return `📊 ${q}\\n\\n🔘 ${o1}\\n🔘 ${o2}`;
+                }};
+            }
+            
+            const { value: text } = await Swal.fire({
+                ...config,
+                showCancelButton: true,
+                confirmButtonText: 'Publicar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (text) {
+                let finalContent = text;
+                if (type === 'Pregunta') finalContent = `❓ ${text}`;
+                if (type === 'Artículo') finalContent = `📄 ${text}`;
+                
+                try {
+                    await window.DB.createPost(currentUser.id, finalContent, null);
+                    await loadFeed();
+                    Toast.fire({ icon: 'success', title: 'Publicado con éxito' });
+                } catch(e) { window.showErrorModal('Error', e.message); }
+            }
+        };
+
+        window.loadSavedPosts = async function() {
+            Toast.fire({ icon: 'info', title: 'Mostrando guardados/me gusta...' });
+            const posts = await window.DB.getPosts();
+            const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+            
+            // Temporary override window.DB.getPosts just for this render cycle
+            const originalGetPosts = window.DB.getPosts;
+            window.DB.getPosts = async () => posts.filter(p => likedPosts.includes(p.id));
+            
+            await loadFeed();
+            
+            // Restore
+            window.DB.getPosts = originalGetPosts;
+        };
+
+        window.castPollVote = async function(postId, optIdx) {
+            try {
+                await window.DB.votePoll(postId, currentUser.id, optIdx);
+                await loadFeed();
+                Toast.fire({ icon: 'success', title: 'Voto registrado' });
+            } catch(e) { window.showErrorModal('Error', e.message); }
+        };
+
+        window.showPollVoters = async function(postId) {
+            try {
+                const votes = await window.DB.getPollVotes(postId);
+                if (votes.length === 0) {
+                    Swal.fire({ title: 'Votantes', text: 'Nadie ha votado aún.', confirmButtonColor: 'var(--primary-color)' });
+                    return;
+                }
+                
+                // Group by option_index
+                const groups = {};
+                votes.forEach(v => {
+                    if (!groups[v.option_index]) groups[v.option_index] = [];
+                    groups[v.option_index].push(v);
+                });
+
+                let html = '<div class="text-start" style="max-height: 300px; overflow-y: auto;">';
+                for (const opt in groups) {
+                    html += `<div class="fw-bold mb-2 mt-3" style="color:var(--primary-color);">Opción ${parseInt(opt)+1} (${groups[opt].length} votos)</div>`;
+                    groups[opt].forEach(v => {
+                        const name = v.users?.full_name || v.users?.email || 'Agricultor';
+                        const avatarUrl = v.users?.avatar_url || '';
+                        let avatarHtml = avatarUrl ? `<img src="${avatarUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : `<div style="background:var(--secondary-color); color:var(--primary-color); width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:50%; font-weight:bold;">${name.charAt(0).toUpperCase()}</div>`;
+                        
+                        html += `
+                            <div class="d-flex align-items-center gap-2 mb-2 p-1 border-bottom">
+                                <div class="post-avatar" style="width:30px;height:30px;padding:0;overflow:hidden;">${avatarHtml}</div>
+                                <span class="small">${escapeHTML(name)}</span>
+                            </div>
+                        `;
+                    });
+                }
+                html += '</div>';
+
+                Swal.fire({
+                    title: 'Votantes de la Encuesta',
+                    html: html,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+
+            } catch(e) { window.showErrorModal('Error', 'No se pudieron cargar los votantes.'); }
+        };
+
+        document.addEventListener('DOMContentLoaded', initAgroRed);
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Plan - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .plan-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+        .limit-badge {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            background: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+        }
+        .progress-circle-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .progress-percent {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 animate-slide-up">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="dashboard-title m-0 text-start">Utilización del Plan</h1>
+                <p class="text-muted mb-0" id="current-region-label">Cargando región...</p>
+            </div>
+            <div id="country-selector-container" class="d-none">
+                <select id="country-select" class="form-select border-0 shadow-sm rounded-4 px-4" style="min-width: 250px; background-color: white;">
+                    <!-- Options injected via JS -->
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <!-- Total Regional Users Usage -->
+            <div class="col-lg-6">
+                <div class="plan-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="m-0 fw-bold"><i class="bi bi-people-fill text-primary me-2"></i>Usuarios Regionales</h4>
+                        <span class="limit-badge" id="farmers-plan-label">Plan: BUSCANDO</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="farmersChart"></canvas>
+                        <div class="progress-circle-text d-none d-md-block">
+                            <div class="progress-percent" id="farmers-percent">0%</div>
+                            <div class="small text-muted">Usado</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 row text-center">
+                        <div class="col-4 border-end">
+                            <div class="small text-muted">Límite</div>
+                            <div class="fw-bold" id="farmers-limit">0</div>
+                        </div>
+                        <div class="col-4 border-end">
+                            <div class="small text-muted">Actual</div>
+                            <div class="fw-bold" id="farmers-current">0</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">Disponible</div>
+                            <div class="fw-bold text-success" id="farmers-remaining">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cooperativas Usage -->
+            <div class="col-lg-6">
+                <div class="plan-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="m-0 fw-bold"><i class="bi bi-buildings-fill text-success me-2"></i>Cooperativas</h4>
+                        <span class="limit-badge" id="orgs-plan-label">Plan: BUSCANDO</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="orgsChart"></canvas>
+                        <div class="progress-circle-text d-none d-md-block">
+                            <div class="progress-percent" id="orgs-percent">0%</div>
+                            <div class="small text-muted">Usado</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 row text-center">
+                        <div class="col-4 border-end">
+                            <div class="small text-muted">Límite</div>
+                            <div class="fw-bold" id="orgs-limit">0</div>
+                        </div>
+                        <div class="col-4 border-end">
+                            <div class="small text-muted">Actual</div>
+                            <div class="fw-bold" id="orgs-current">0</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">Disponible</div>
+                            <div class="fw-bold text-success" id="orgs-remaining">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Specific Info -->
+        <div class="plan-card p-4 mb-5 border-start border-primary border-4">
+            <div class="d-flex align-items-start gap-3">
+                <div class="p-3 bg-primary text-white rounded-circle">
+                    <i class="bi bi-info-circle-fill fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-2">Acerca del Límite Regional</h5>
+                    <p class="text-muted small mb-0">
+                        Los límites están definidos por la licencia del país. Al llegar al 100%, no se podrán registrar nuevos agricultores o cooperativas hasta subir de plan. Los planes <strong>Esmeralda</strong> son de uso ilimitado.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+        let farmersChart, orgsChart;
+
+        async function initPlanDashboard() {
+            if (window.initLayout) await window.initLayout('plan');
+            const user = await AuthObj.requireAdmin();
+            
+            if (!['global_owner', 'ministry_admin'].includes(user.role)) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const countries = await window.DB.getCountries();
+            const countrySelector = document.getElementById('country-select');
+            const selectorContainer = document.getElementById('country-selector-container');
+
+            if (user.role === 'global_owner') {
+                selectorContainer.classList.remove('d-none');
+                document.getElementById('current-region-label').innerText = 'Selecciona una región para ver estadísticas';
+                
+                countrySelector.innerHTML = countries.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                countrySelector.value = user.country_id || countries[0].id;
+                
+                countrySelector.addEventListener('change', () => loadStats(countrySelector.value));
+                loadStats(countrySelector.value);
+            } else {
+                const currentCountry = countries.find(c => String(c.id) === String(user.country_id));
+                document.getElementById('current-region-label').innerText = `Jurisdicción: ${currentCountry ? currentCountry.name : 'Tu País'}`;
+                loadStats(user.country_id);
+            }
+        }
+
+        async function loadStats(countryId) {
+            console.log("Cargando estadísticas para país ID:", countryId);
+            const countries = await window.DB.getCountries();
+            const country = countries.find(c => String(c.id) === String(countryId));
+            
+            if (!country) {
+                console.warn("No se encontró el país con ID:", countryId, "en la lista:", countries);
+            } else {
+                console.log("Base de datos país:", country.name, "Plan:", country.plan);
+            }
+
+            const plan = country ? (country.plan || 'none') : 'none';
+            
+            // Current counts
+            const allUsers = await window.DB.getAllUsers({ role: 'global_owner' }); 
+            console.log("Total usuarios recuperados:", allUsers.length);
+
+            // Count everyone except global_owner in this country
+            const regionalUsers = allUsers.filter(u => {
+                return String(u.country_id) === String(countryId) && u.role !== 'global_owner';
+            }).length;
+            
+            console.log("Usuarios regionales totales (inc. admins):", regionalUsers);
+
+            const allOrgs = await window.DB.getCooperativasByCountry(countryId);
+            const countryOrgs = allOrgs.length;
+            console.log("Cooperativas contadas:", countryOrgs);
+
+            // Limits from database.js logic
+            const fLimits = { 'none': 50, 'bronce': 1000, 'platinium': 2500, 'diamante': 5000, 'esmeralda': 999999 };
+            const oLimits = { 'none': 1, 'bronce': 3, 'platinium': 10, 'diamante': 25, 'esmeralda': 999 };
+            
+            const fLimit = fLimits[plan] || 50;
+            const oLimit = oLimits[plan] || 1;
+
+            updateCharts(regionalUsers, fLimit, countryOrgs, oLimit, plan);
+            updateUI(regionalUsers, fLimit, countryOrgs, oLimit, plan);
+            
+            // Update label if not in global mode or just to confirm
+            if (user.role === 'ministry_admin') {
+                document.getElementById('current-region-label').innerText = `Jurisdicción: ${country ? country.name : 'Desconocida'}`;
+            } else {
+                document.getElementById('current-region-label').innerText = `Visualizando: ${country ? country.name : 'Región Global'}`;
+            }
+        }
+
+        function updateUI(fCount, fLimit, oCount, oLimit, plan) {
+            const isUnlimited = plan === 'esmeralda';
+            
+            document.getElementById('farmers-plan-label').innerText = `Plan: ${plan.toUpperCase()}`;
+            document.getElementById('orgs-plan-label').innerText = `Plan: ${plan.toUpperCase()}`;
+
+            document.getElementById('farmers-limit').innerText = isUnlimited ? '∞' : fLimit;
+            document.getElementById('farmers-current').innerText = fCount;
+            document.getElementById('farmers-remaining').innerText = isUnlimited ? '∞' : Math.max(0, fLimit - fCount);
+            
+            document.getElementById('orgs-limit').innerText = isUnlimited ? '∞' : oLimit;
+            document.getElementById('orgs-current').innerText = oCount;
+            document.getElementById('orgs-remaining').innerText = isUnlimited ? '∞' : Math.max(0, oLimit - oCount);
+
+            const fPercent = isUnlimited ? 0 : Math.round((fCount / fLimit) * 100);
+            const oPercent = isUnlimited ? 0 : Math.round((oCount / oLimit) * 100);
+
+            document.getElementById('farmers-percent').innerText = isUnlimited ? 'UNL' : `${fPercent}%`;
+            document.getElementById('orgs-percent').innerText = isUnlimited ? 'UNL' : `${oPercent}%`;
+        }
+
+        function updateCharts(fCount, fLimit, oCount, oLimit, plan) {
+            const isUnlimited = plan === 'esmeralda';
+            
+            // Farmers Chart
+            const fCtx = document.getElementById('farmersChart').getContext('2d');
+            if (farmersChart) farmersChart.destroy();
+            farmersChart = new Chart(fCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: isUnlimited ? [1, 0] : [fCount, Math.max(0, fLimit - fCount)],
+                        backgroundColor: [isUnlimited ? '#10b981' : '#1d4ed8', '#f1f5f9'],
+                        borderWidth: 0,
+                        cutout: '80%'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { tooltip: { enabled: !isUnlimited } }
+                }
+            });
+
+            // Orgs Chart
+            const oCtx = document.getElementById('orgsChart').getContext('2d');
+            if (orgsChart) orgsChart.destroy();
+            orgsChart = new Chart(oCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: isUnlimited ? [1, 0] : [oCount, Math.max(0, oLimit - oCount)],
+                        backgroundColor: [isUnlimited ? '#10b981' : '#10b981', '#f1f5f9'],
+                        borderWidth: 0,
+                        cutout: '80%'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { tooltip: { enabled: !isUnlimited } }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initPlanDashboard);
+    </script>
+</body>
+</html>

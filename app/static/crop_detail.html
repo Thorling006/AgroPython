@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Cultivo - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.108/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.108/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 mb-5 animate-slide-up">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-circle bg-success-soft text-success m-0" style="width: 50px; height: 50px; font-size: 24px;">
+                    <i class="bi bi-tree-fill"></i>
+                </div>
+                <div>
+                    <h1 class="dashboard-title m-0 fw-bold" id="header-title">Cargando...</h1>
+                    <p class="text-muted m-0 small" id="header-subtitle">Detalles del cultivo</p>
+                </div>
+            </div>
+            <div class="action-bar d-flex flex-wrap gap-2" id="header-actions">
+                <a href="dashboard.html" class="btn btn-secondary btn-sm rounded-pill px-3"><i class="bi bi-arrow-left me-1"></i> Volver</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Izquierda: Info & Catálogo -->
+            <div class="col-lg-4">
+                <div class="agro-card p-4 mb-4" id="crop-info-card">
+                    <div class="placeholder-glow">
+                        <span class="placeholder col-7"></span>
+                        <span class="placeholder col-4"></span>
+                        <span class="placeholder col-4"></span>
+                        <span class="placeholder col-6"></span>
+                        <span class="placeholder col-8"></span>
+                    </div>
+                </div>
+                <div id="catalog-info-card"></div>
+            </div>
+
+            <!-- Derecha: Clima, IA y Mapa -->
+            <div class="col-lg-8">
+                <div class="agro-card p-4 mb-4 shadow-sm" style="background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(16,185,129,0.1) 100%); border-left: 4px solid var(--primary-color);">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-cpu-fill text-success fs-4 animate-pulse"></i>
+                        <h5 class="m-0 fw-bold text-success">Recomendación Agro IA</h5>
+                    </div>
+                    <p id="ai-recommendation" class="mb-0 text-dark fw-medium">Analizando datos geoespaciales e instrumentales...</p>
+                </div>
+
+                <div class="row g-3 mb-4" id="weather-section" style="display:none;">
+                    <!-- Weather cards injected here -->
+                </div>
+
+                <div class="agro-card p-0 overflow-hidden position-relative shadow-sm" style="height: 480px; border-radius: 20px;">
+                    <div class="position-absolute top-0 start-0 w-100 p-3" style="background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); z-index: 10; pointer-events: none;">
+                        <h5 class="text-white m-0 fw-bold"><i class="bi bi-geo-alt-fill text-warning me-2"></i>Monitoreo Satelital 3D</h5>
+                        <p class="text-white-50 m-0 small">Visualización interactiva en tiempo real</p>
+                    </div>
+                    <div id="weather-map" class="w-100 h-100 map-container border-0 m-0" style="border-radius: 20px;">
+                        <div class="map-zoom-controls animate-slide-up" style="bottom: 20px; right: 20px; z-index: 10;">
+                            <button class="map-zoom-btn shadow" type="button" onclick="if(window.viewer) window.viewer.camera.zoomIn(window.viewer.camera.positionCartographic.height * 0.5);" title="Acercar">+</button>
+                            <button class="map-zoom-btn shadow mt-2" type="button" onclick="if(window.viewer) window.viewer.camera.zoomOut(window.viewer.camera.positionCartographic.height * 0.5);" title="Alejar">−</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/crop_catalog.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+        let crop;
+        let detailMarker = null;
+
+        window.addEventListener('unhandledrejection', function (event) {
+            if (event.reason) {
+                const msg = event.reason.message || '';
+                if (msg.includes('Failed to fetch') || msg.includes('NetworkError') ||
+                    (typeof event.reason === 'object' && event.reason.statusCode === undefined && event.reason.response === undefined)) {
+                    event.preventDefault();
+                }
+            }
+        });
+
+        async function initCropDetail() {
+            if (window.initLayout) await window.initLayout('crop_detail');
+            await AuthObj.requireAuth();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const cropId = urlParams.get('id');
+            const currentUser = await AuthObj.getCurrentUser();
+            const allCrops = await window.DB.getAllCrops();
+            crop = allCrops.find(c => c.id == cropId);
+
+            if (!crop || (crop.user_id !== currentUser.id && !currentUser.is_superuser)) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Actualizar Cabecera
+            document.getElementById('header-title').innerText = crop.name;
+            document.getElementById('header-subtitle').innerText = "Registrado el " + new Date(crop.sowing_date).toLocaleDateString();
+            
+            // Botones de acción en cabecera
+            document.getElementById('header-actions').innerHTML = `
+                <a href="crop_edit.html?id=${crop.id}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold"><i class="bi bi-pencil-fill me-1"></i> Editar</a>
+                <a href="abono_application.html?id=${crop.id}" class="btn btn-agro-primary btn-sm rounded-pill px-3 fw-bold"><i class="bi bi-moisture me-1"></i> Gestionar Abonos</a>
+                <button onclick="realDeleteCrop(${crop.id})" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold"><i class="bi bi-trash-fill me-1"></i> Eliminar</button>
+                <a href="dashboard.html" class="btn btn-secondary btn-sm rounded-pill px-3"><i class="bi bi-arrow-left me-1"></i> Volver</a>
+            `;
+
+            // Buscar en catálogo
+            const normalize = (s) => (s || "").toLowerCase().trim();
+            const cName = normalize(crop.name);
+            const catalog = window.CROP_CATALOG || {};
+            const matchKey = Object.keys(catalog).find(k => normalize(catalog[k].name) === cName);
+            const catalogEntry = matchKey ? catalog[matchKey] : null;
+
+            // Info Card (Izquierda)
+            document.getElementById('crop-info-card').innerHTML = `
+                <h5 class="fw-bold mb-3 d-flex justify-content-between align-items-center">
+                    Información General
+                    <span class="badge bg-success-soft text-success px-2 py-1 rounded-pill small"><i class="bi bi-check-circle-fill me-1"></i> Vigente</span>
+                </h5>
+                <div class="mb-3">
+                    <label class="small text-muted text-uppercase fw-bold mb-1"><i class="bi bi-card-text me-1"></i> Descripción del productor</label>
+                    <p class="mb-0">${crop.description}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="small text-muted text-uppercase fw-bold mb-1"><i class="bi bi-calendar-event me-1"></i> Fecha de siembra</label>
+                    <p class="mb-0 fw-medium">${new Date(crop.sowing_date).toLocaleDateString()}</p>
+                </div>
+                ${catalogEntry ? `<div class="mb-0"><label class="small text-muted text-uppercase fw-bold mb-1"><i class="bi bi-bookmark-star me-1"></i> Nombre Científico</label><p class="mb-0 italic text-success">${catalogEntry.scientific_name}</p></div>` : ''}
+            `;
+
+            // Catalog Sheet
+            if (catalogEntry) {
+                document.getElementById('catalog-info-card').innerHTML = `
+                    <div class="agro-card p-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <h5 class="m-0 fw-bold">📋 Ficha Técnica</h5>
+                            <span class="badge bg-primary bg-opacity-10 text-primary small rounded-pill border border-primary border-opacity-25">Catálogo Oficial</span>
+                        </div>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center gap-3 bg-light-soft p-2 rounded">
+                                <div class="fs-3 text-warning"><i class="bi bi-thermometer-half"></i></div>
+                                <div>
+                                    <div class="small text-muted fw-bold">Temp. Ideal</div>
+                                    <div class="fw-bold">${catalogEntry.min_temp}°C - ${catalogEntry.max_temp}°C</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 bg-light-soft p-2 rounded">
+                                <div class="fs-3 text-info"><i class="bi bi-droplet-half"></i></div>
+                                <div>
+                                    <div class="small text-muted fw-bold">Humedad Óptima</div>
+                                    <div class="fw-bold">${catalogEntry.min_humidity}% - ${catalogEntry.max_humidity}%</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 bg-light-soft p-2 rounded">
+                                <div class="fs-3 text-success"><i class="bi bi-layers"></i></div>
+                                <div>
+                                    <div class="small text-muted fw-bold">Suelo</div>
+                                    <div class="fw-bold text-truncate" title="${catalogEntry.soil_type}" style="max-width: 150px;">${catalogEntry.soil_type}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Initialize Map
+            let lat = crop.latitude ? parseFloat(crop.latitude) : 13.7;
+            let lng = crop.longitude ? parseFloat(crop.longitude) : -89.2;
+
+            try {
+                Cesium.Ion.defaultAccessToken = null;
+                const satelliteProvider = await Cesium.ArcGisMapServerImageryProvider.fromUrl('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer', { maximumLevel: 19 });
+                if (satelliteProvider?.errorEvent) satelliteProvider.errorEvent.addEventListener(e => e.retry = false);
+
+                const viewer = new Cesium.Viewer('weather-map', {
+                    animation: false,
+                    baseLayerPicker: false,
+                    fullscreenButton: false,
+                    vrButton: false,
+                    geocoder: false,
+                    homeButton: false,
+                    infoBox: false,
+                    sceneModePicker: false,
+                    selectionIndicator: false,
+                    timeline: false,
+                    navigationHelpButton: false,
+                    navigationInstructionsInitiallyVisible: false,
+                    scene3DOnly: true,
+                    baseLayer: Cesium.ImageryLayer.fromProviderAsync(Promise.resolve(satelliteProvider))
+                });
+                window.viewer = viewer;
+
+                viewer.scene.mode = Cesium.SceneMode.SCENE3D;
+                viewer.scene.globe.enableLighting = true;
+                viewer.scene.globe.depthTestAgainstTerrain = true;
+
+                viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(lng, lat, 10000.0) });
+
+                // DIBUJAR MARCADOR / POLÍGONO
+                // CORRECCIÓN: outline en false para polígonos sobre terreno (evita advertencias de Cesium)
+                let detailMarker = null;
+                if (crop.polygon_area) {
+                    try {
+                        const coords = typeof crop.polygon_area === 'string' ? JSON.parse(crop.polygon_area) : crop.polygon_area;
+                        if (coords && coords.length >= 3) {
+                            const hierarchy = coords.map(pt => Cesium.Cartesian3.fromDegrees(pt.lng, pt.lat));
+                            detailMarker = viewer.entities.add({
+                                polygon: {
+                                    hierarchy: new Cesium.PolygonHierarchy(hierarchy),
+                                    material: Cesium.Color.fromCssColorString('#10b981').withAlpha(0.5),
+                                    outline: false, 
+                                    height: 0
+                                },
+                                position: Cesium.Cartesian3.fromDegrees(coords[0].lng, coords[0].lat),
+                                label: { text: crop.name, font: 'bold 12pt Inter', style: Cesium.LabelStyle.FILL_AND_OUTLINE, outlineWidth: 3, outlineColor: Cesium.Color.BLACK, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, pixelOffset: new Cesium.Cartesian2(0, -9) }
+                            });
+                            viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(coords[0].lng, coords[0].lat, 5000.0) });
+                        }
+                    } catch (e) { }
+                }
+
+                if (!detailMarker) {
+                    detailMarker = viewer.entities.add({
+                        position: Cesium.Cartesian3.fromDegrees(lng, lat),
+                        point: { pixelSize: 16, color: Cesium.Color.fromCssColorString('#10b981'), outlineColor: Cesium.Color.WHITE, outlineWidth: 3 },
+                        label: { text: crop.name, font: 'bold 12pt Inter', style: Cesium.LabelStyle.FILL_AND_OUTLINE, outlineWidth: 3, outlineColor: Cesium.Color.BLACK, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, pixelOffset: new Cesium.Cartesian2(0, -12) }
+                    });
+                }
+            } catch (err) {}
+
+            // Fetch Real Weather
+            if (CONFIG.OPENWEATHERMAP_API_KEY) {
+                try {
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=metric&lang=es&appid=${CONFIG.OPENWEATHERMAP_API_KEY}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    document.getElementById('weather-section').style.display = 'flex';
+                    document.getElementById('weather-section').innerHTML = `
+                        <div class="col-md-3 col-6">
+                            <div class="agro-card p-3 text-center h-100 d-flex flex-column justify-content-center">
+                                <i class="bi bi-thermometer-sun fs-2 text-warning mb-1"></i>
+                                <div class="small text-muted fw-bold text-uppercase">Temp</div>
+                                <div class="fs-4 fw-bold">${data.main.temp}°C</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="agro-card p-3 text-center h-100 d-flex flex-column justify-content-center">
+                                <i class="bi bi-droplet-fill fs-2 text-info mb-1"></i>
+                                <div class="small text-muted fw-bold text-uppercase">Humedad</div>
+                                <div class="fs-4 fw-bold">${data.main.humidity}%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="agro-card p-3 text-center h-100 d-flex flex-column justify-content-center">
+                                <i class="bi bi-cloud-rain-fill fs-2 text-primary mb-1"></i>
+                                <div class="small text-muted fw-bold text-uppercase">Lluvia</div>
+                                <div class="fs-4 fw-bold">${data.rain ? data.rain['1h'] : 0}<span class="fs-6">mm</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="agro-card p-3 text-center h-100 d-flex flex-column justify-content-center">
+                                <i class="bi bi-wind fs-2 text-secondary mb-1"></i>
+                                <div class="small text-muted fw-bold text-uppercase">Viento</div>
+                                <div class="fs-4 fw-bold">${data.wind.speed}<span class="fs-6">m/s</span></div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Generate AI Mock Recommendation
+                    if (data.main.temp > 30 && data.rain === undefined) {
+                        document.getElementById('ai-recommendation').innerHTML = 'Las temperaturas son altas (<b class="text-danger">' + data.main.temp + '°C</b>) y no hay lluvia. Se recomienda <span class="text-success fw-bold">aumentar el riego</span> en las próximas horas.';
+                    } else if (data.rain) {
+                        document.getElementById('ai-recommendation').innerHTML = 'Hay lluvia registrada. <span class="text-danger fw-bold">Suspender riego programado</span> para evitar saturamiento de humedad en el suelo.';
+                    } else {
+                        document.getElementById('ai-recommendation').innerHTML = 'Condiciones climáticas estables y óptimas. Mantén tu programa de manejo habitual de este cultivo.';
+                    }
+
+                } catch (e) {
+                    document.getElementById('ai-recommendation').innerText = 'No se pudo obtener información climática (Error de red).';
+                }
+            } else {
+                document.getElementById('ai-recommendation').innerText = 'Configura tu OPENWEATHERMAP_API_KEY para habilitar la predicción.';
+            }
+        }
+
+        window.realDeleteCrop = async function (id) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Eliminar Cultivo',
+                    text: '¿Estás seguro de que quieres eliminar este registro permanentemente?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await window.DB.deleteCrop(id);
+                        window.location.href = 'dashboard.html';
+                    }
+                });
+            } else {
+                if (confirm('¿Eliminar cultivo?')) {
+                    await window.DB.deleteCrop(id);
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initCropDetail);
+    </script>
+</body>
+</html>

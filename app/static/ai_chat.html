@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro IA - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .chat-container-main {
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 20px;
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
+            line-height: 1.5;
+        }
+        .chat-bubble-user {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #276749 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 5px 15px rgba(47, 133, 90, 0.2);
+        }
+        .chat-bubble-ai {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--box-shadow);
+        }
+        .chat-input-area {
+            padding: 20px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+        .ai-typing-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .ai-typing-indicator:nth-child(1) { animation-delay: -0.32s; }
+        .ai-typing-indicator:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .markdown-body p:last-child { margin-bottom: 0; }
+        .markdown-body pre { background: rgba(0,0,0,0.05); padding: 10px; border-radius: 10px; overflow-x: auto; }
+        .markdown-body code { font-family: monospace; color: var(--agro-primary); }
+    </style>
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 mb-4">
+        <div class="row h-100 justify-content-center">
+            <div class="col-lg-10">
+                <!-- Header IA -->
+                <div class="d-flex justify-content-between align-items-center mb-4 animate-slide-up">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-circle bg-success-soft text-success m-0" style="width: 50px; height: 50px; font-size: 24px;">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div>
+                            <h2 class="m-0 fw-bold dashboard-title text-start mb-1" style="font-size: 28px;">Agro IA</h2>
+                            <p class="text-muted m-0 small">Asistente Inteligente basado en OpenRouter</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="openSettingsModal()">
+                            <i class="bi bi-gear-fill me-1"></i> Configuración
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Card -->
+                <div class="agro-card p-0 chat-container-main animate-slide-up animate-delay-1">
+                    <!-- Messages Area -->
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-bubble chat-bubble-ai">
+                            <div class="d-flex gap-2 mb-2 align-items-center">
+                                <i class="bi bi-robot text-success"></i>
+                                <strong class="small">Agro IA</strong>
+                            </div>
+                            <div class="markdown-body">
+                                ¡Hola! Soy tu asistente agrícola inteligente. Estoy aquí para ayudarte con recomendaciones sobre cultivos, control de plagas, calendarios lunares y fertilización. ¿En qué puedo apoyarte hoy en tu parcela?
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="chat-input-area">
+                        <form id="chat-form" class="d-flex gap-3 align-items-end">
+                            <div class="flex-grow-1">
+                                <textarea class="form-control" id="chat-input" rows="1" placeholder="Escribe tu consulta agrícola aquí..." style="resize: none; border-radius: 20px; overflow-y: hidden;"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-agro-primary" style="border-radius: 50%; width: 50px; height: 50px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" id="send-btn">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configuración -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content agro-card p-4 border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-cpu-fill text-success me-2"></i> Motor Inteligente (G0DM0D3)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-4">Selecciona la red neuronal que impulsará tus respuestas. Todos los modelos están cubiertos por tus planes Diamante y Esmeralda.</p>
+                    <div class="form-group mb-4">
+                        <label class="form-label fw-bold text-success">Selección de Arquitectura</label>
+                        <select id="model-select" class="form-control" style="background: rgba(0,0,0,0.2); color: var(--text-main); border: 1px solid var(--border-color);">
+                            <optgroup label="⚡ FAST (1-10)">
+                                <option value="google/gemini-2.0-flash-001">Gemini 2.5 Flash</option>
+                                <option value="deepseek/deepseek-chat">DeepSeek V3</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Perplexity Sonar</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
+                                <option value="google/gemini-2.0-flash-001">Kimi K2.5</option>
+                                <option value="openai/gpt-4o-mini">Grok Code Fast</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">MiMo-V2 Flash</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">GPT-OSS 20B</option>
+                                <option value="google/gemini-2.0-flash-001">Step 3.5 Flash</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Nemotron 3 Nano 30B A3B</option>
+                            </optgroup>
+                            <optgroup label="🎯 +STANDARD (11-24)">
+                                <option value="anthropic/claude-3.5-haiku">Claude 3.5 Sonnet</option>
+                                <option value="deepseek/deepseek-chat">Llama 4 Scout</option>
+                                <option value="deepseek/deepseek-chat">DeepSeek V3.2</option>
+                                <option value="deepseek/deepseek-chat">Hermes 3 70B</option>
+                                <option value="openai/gpt-4o-mini">GPT-4o</option>
+                                <option value="google/gemini-2.0-flash-001">Gemini 2.5 Pro</option>
+                                <option value="anthropic/claude-3.5-haiku">Claude Sonnet 4</option>
+                                <option value="anthropic/claude-3.5-haiku">Claude Sonnet 4.6</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Mixtral 8x22B</option>
+                                <option value="deepseek/deepseek-chat">Llama 3.3 70B</option>
+                                <option value="deepseek/deepseek-chat">Qwen 2.5 72B</option>
+                                <option value="deepseek/deepseek-chat">Hermes 4 70B</option>
+                                <option value="google/gemini-2.0-flash-001">GLM-5 Turbo</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Mistral Medium 3.1</option>
+                            </optgroup>
+                            <optgroup label="🧠 +SMART (25-38)">
+                                <option value="google/gemini-2.0-flash-001">Gemma 3 27B</option>
+                                <option value="openai/gpt-4o-mini">GPT-5</option>
+                                <option value="openai/gpt-4o-mini">GPT-5.4 Chat</option>
+                                <option value="deepseek/deepseek-chat">Qwen 3.5 Plus</option>
+                                <option value="openai/gpt-4o-mini">GLM-5</option>
+                                <option value="openai/gpt-4o-mini">GPT-5.2</option>
+                                <option value="google/gemini-2.0-flash-001">Gemini 3 Pro</option>
+                                <option value="google/gemini-2.0-flash-001">Gemini 3.1 Pro</option>
+                                <option value="anthropic/claude-3.5-haiku">Claude Opus 4.6</option>
+                                <option value="deepseek/deepseek-chat">GPT-OSS 120B</option>
+                                <option value="deepseek/deepseek-chat">DeepSeek R1</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Nemotron 3 Super</option>
+                                <option value="deepseek/deepseek-chat">Llama 3.1 405B</option>
+                                <option value="deepseek/deepseek-chat">Hermes 4 405B</option>
+                            </optgroup>
+                            <optgroup label="⚔️ +POWER (39-49)">
+                                <option value="deepseek/deepseek-chat">Hermes 3 405B</option>
+                                <option value="openai/gpt-4o-mini">Grok 4</option>
+                                <option value="deepseek/deepseek-chat">GLM-4.7</option>
+                                <option value="deepseek/deepseek-chat">Llama 4 Maverick</option>
+                                <option value="deepseek/deepseek-chat">Qwen3 235B</option>
+                                <option value="deepseek/deepseek-chat">Qwen3 Coder 480B</option>
+                                <option value="google/gemini-2.0-flash-001">MiniMax M2.5</option>
+                                <option value="google/gemini-2.0-flash-001">MiMo-V2 Pro</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct">Mistral Large 3</option>
+                                <option value="google/gemini-2.0-flash-001">Gemini 3 Flash</option>
+                                <option value="deepseek/deepseek-chat">Kimi K2</option>
+                            </optgroup>
+                            <optgroup label="🔱 +ULTRA (50-55)">
+                                <option value="openai/gpt-4o-mini">Grok 4 Fast</option>
+                                <option value="openai/gpt-4o-mini">Grok 4.1 Fast</option>
+                                <option value="anthropic/claude-3.5-haiku">Claude Opus 4</option>
+                                <option value="deepseek/deepseek-chat">Qwen 2.5 Coder 32B</option>
+                                <option value="deepseek/deepseek-chat">QwQ 32B</option>
+                                <option value="deepseek/deepseek-chat">Codestral 250B</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="form-label fw-bold text-success"><i class="bi bi-mic-fill me-1"></i>Voz de Jarvis (Inteligencia Madre)</label>
+                        <select id="jarvis-voice-select" class="form-control" style="background: rgba(0,0,0,0.2); color: var(--text-main); border: 1px solid var(--border-color);">
+                            <option value="0">Voz Predeterminada del Sistema</option>
+                        </select>
+                        <small class="text-muted d-block mt-2">Jarvis utilizará el mismo motor G0DM0D3 seleccionado arriba para sus respuestas por voz.</small>
+                    </div>
+                    <button class="btn btn-agro-primary w-100" onclick="saveSettings()">Guardar Configuración</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/ai_chat.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.initLayout) await window.initLayout('ai_chat');
+            
+            // Security Check for Esmeralda Plan
+            setTimeout(async () => {
+                const user = typeof AuthObj !== 'undefined' ? await AuthObj.getCurrentUser() : null;
+                if (!user) {
+                    window.location.replace('index.html');
+                    return;
+                }
+                if (user.role !== 'global_owner') {
+                    const countries = await window.DB.getCountries();
+                    const country = countries.find(c => String(c.id) === String(user.country_id));
+                    const plan = country ? (country.plan || 'none').toLowerCase() : 'none';
+                    
+                    if (!['diamante', 'esmeralda'].includes(plan)) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Acceso Denegado',
+                                text: 'Agro IA es una característica exclusiva de los planes Diamante y Esmeralda.',
+                                confirmButtonColor: '#10b981',
+                                allowOutsideClick: false
+                            }).then(() => {
+                                window.location.replace('dashboard.html');
+                            });
+                        } else {
+                            alert('Acceso Denegado. Exclusivo planes Diamante y Esmeralda.');
+                            window.location.replace('dashboard.html');
+                        }
+                    }
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

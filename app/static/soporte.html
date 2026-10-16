@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte Integral y Videollamadas - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- SweetAlert2 & EmailJS & Jitsi -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <style>
+        /* Estilos generales del centro de soporte */
+        .soporte-workspace {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero-support-header {
+            background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+            border-radius: 28px;
+            padding: 45px 40px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-support-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Pestañas principales de navegación */
+        .main-nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow);
+            overflow-x: auto;
+        }
+
+        .main-tab-btn {
+            flex: 1;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        .main-tab-btn:hover {
+            color: var(--primary-color);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .main-tab-btn.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Pestañas secundarias de fichas */
+        .sub-nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .sub-tab-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .sub-tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(47, 133, 90, 0.3);
+        }
+
+        /* Paneles de contenido */
+        .main-pane,
+        .sub-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .main-pane.active,
+        .sub-pane.active {
+            display: block;
+        }
+
+        /* Formulario y Tarjetas */
+        .support-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        #meet-container {
+            width: 100%;
+            height: 700px;
+            background: #0f172a;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Tabla limpia */
+        .reports-table-container {
+            overflow-x: auto;
+        }
+
+        .table-clean {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-clean th {
+            padding: 16px 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+            text-align: left;
+        }
+
+        .table-clean td {
+            padding: 18px 20px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            vertical-align: middle;
+        }
+
+        .badge-status {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .badge-status-open {
+            background: rgba(59, 130, 246, 0.15);
+            color: #2563eb;
+        }
+
+        .badge-status-in_progress {
+            background: rgba(245, 158, 11, 0.15);
+            color: #d97706;
+        }
+
+        .badge-status-resolved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
+        }
+
+        .badge-status-critical {
+            background: #dc2626;
+            color: white;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-action-sm {
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action-gmail {
+            background: rgba(239, 68, 68, 0.12);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-action-gmail:hover {
+            background: #dc2626;
+            color: white;
+            transform: scale(1.03);
+        }
+
+        .btn-action-resolve {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-action-resolve:hover {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-action-room {
+            background: rgba(47, 133, 90, 0.15);
+            color: var(--primary-hover);
+            border: 1px solid rgba(47, 133, 90, 0.3);
+        }
+
+        .btn-action-room:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-action-escalate {
+            background: rgba(245, 158, 11, 0.15);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-action-escalate:hover {
+            background: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="soporte-workspace animate__animated animate__fadeIn">
+        <!-- Hero Header -->
+        <div
+            class="hero-support-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+            <div>
+                <span class="badge bg-success px-3 py-2 rounded-pill text-uppercase fw-bold mb-3">Centro Unificado
+                    Corporativo</span>
+                <h1 class="display-5 fw-800 mb-2"><i class="bi bi-headset me-2 text-success"></i>Soporte Integral &
+                    Videollamadas</h1>
+                <p class="opacity-75 lead mb-0" style="max-width: 750px;">
+                    Gestión de incidencias con tiempo límite de 72 horas, asistencia P2P por sala satelital y acceso al
+                    Manual de Usuario Oficial.
+                </p>
+            </div>
+            <div class="text-md-end">
+                <div id="user-role-badge"
+                    class="badge bg-dark border border-success p-3 rounded-4 shadow-sm text-start">
+                    <div class="small text-muted mb-1"><i class="bi bi-person-badge me-1"></i>Nivel de Acceso:</div>
+                    <div id="role-display-text" class="fw-bold text-success fs-6">Verificando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestañas Principales -->
+        <div class="main-nav-tabs">
+            <button class="main-tab-btn active" onclick="switchMainTab('fichas')" id="main-tab-btn-fichas">
+                <i class="bi bi-ticket-detailed-fill"></i>
+                <span>1. Gestión de Fichas & Videollamadas</span>
+            </button>
+            <button class="main-tab-btn" onclick="switchMainTab('manual')" id="main-tab-btn-manual">
+                <i class="bi bi-book-half" style="color: #ffd700;"></i>
+                <span>2. Manual de Usuario Oficial</span>
+            </button>
+        </div>
+
+        <!-- PESTAÑA PRINCIPAL 1: FICHAS Y VIDEOLLAMADAS -->
+        <div id="main-pane-fichas" class="main-pane active">
+            <!-- Pestañas Secundarias -->
+            <div class="sub-nav-tabs">
+                <button class="sub-tab-btn active" onclick="switchSubTab('create')" id="sub-tab-btn-create">
+                    <i class="bi bi-plus-circle-fill"></i> Nueva Ficha / Iniciar Llamada
+                </button>
+                <button class="sub-tab-btn" onclick="switchSubTab('room')" id="sub-tab-btn-room">
+                    <i class="bi bi-broadcast"></i> Sala de Conferencia P2P
+                </button>
+                <button class="sub-tab-btn" onclick="switchSubTab('history')" id="sub-tab-btn-history">
+                    <i class="bi bi-folder2-open"></i> Registro Oficial de Fichas
+                </button>
+            </div>
+
+            <!-- SUB-PESTAÑA A: CREAR FICHA -->
+            <div id="sub-pane-create" class="sub-pane active">
+                <div class="support-card max-w-4xl mx-auto" style="max-width: 850px;">
+                    <!-- Aviso SLA 72 Horas -->
+                    <div class="alert alert-info border-info border-opacity-50 rounded-4 p-4 mb-4 d-flex align-items-center gap-3"
+                        style="background: rgba(47, 133, 90, 0.08);">
+                        <i class="bi bi-clock-history fs-2 text-info"></i>
+                        <div>
+                            <strong class="text-dark d-block fs-6 mb-1">SLA de Resolución Corporativa (Máximo 72
+                                Horas)</strong>
+                            <span class="small text-muted">Todas las fichas generadas en esta plataforma tienen un
+                                tiempo límite estricto de respuesta de <strong>3 días (72 horas)</strong>. Si un caso
+                                excede este lapso sin ser resuelto o cerrado, pasará automáticamente al estado <span
+                                    class="badge bg-danger">CRÍTICA</span>.</span>
+                        </div>
+                    </div>
+
+                    <!-- Aviso Regla Creadores/Dueños -->
+                    <div id="creator-notice-box"
+                        class="alert alert-warning border-warning border-opacity-50 rounded-4 p-4 mb-4"
+                        style="display: none; background: rgba(245, 158, 11, 0.1);">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-shield-lock-fill fs-2 text-warning"></i>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Modo Creador / Dueño Global (Atlas Digital)</h6>
+                                <p class="small text-muted mb-0">
+                                    Por normativas de jerarquía corporativa de AgroSmart, los <strong>Creadores y Dueños
+                                        Globales</strong> no tienen la potestad de crear nuevas fichas de incidencias.
+                                    Su función exclusiva es atender, gestionar y resolver las fichas dirigidas a ustedes
+                                    o escaladas por los Administradores de Ministerio.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ticket-form-wrapper">
+                        <h4 class="fw-bold mb-4 text-dark"><i
+                                class="bi bi-file-earmark-plus-fill me-2 text-primary"></i>Generar Nueva Ficha de
+                            Soporte</h4>
+
+                        <form id="create-report-form" onsubmit="handleCreateReport(event)">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Nombre del Solicitante</label>
+                                    <input type="text" id="rep-name" class="form-control rounded-3" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Rol en el Sistema</label>
+                                    <input type="text" id="rep-role" class="form-control rounded-3" readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" style="display: none;">
+                                <label class="form-label small fw-bold text-muted">Dirigido a (Destinatario del
+                                    Caso)</label>
+                                <select id="rep-target" class="form-select rounded-3 fw-bold text-primary">
+                                    <!-- Llenado dinámicamente según rol, pero ahora oculto porque es automático -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Asunto del Soporte o
+                                    Incidencia</label>
+                                <select id="rep-subject" class="form-select rounded-3">
+                                    <option value="Asesoría Agronómica y Plan de Abonado">🌱 Asesoría Agronómica y Plan
+                                        de Abonado</option>
+                                    <option value="Duda Técnica en Monitoreo Satelital (NDVI)">🛰️ Duda Técnica en
+                                        Monitoreo Satelital (NDVI)</option>
+                                    <option value="Soporte en Sensores Hardware IoT y Clima">📡 Soporte en Sensores
+                                        Hardware IoT y Clima</option>
+                                    <option value="Consulta sobre Calendario Lunar y Riego">🌙 Consulta sobre Calendario
+                                        Lunar y Riego</option>
+                                    <option value="Reporte de Incidencia en Plataforma / App">⚠️ Reporte de Incidencia
+                                        en Plataforma / App</option>
+                                    <option value="Solicitud de Capacitación / Videollamada P2P">🎥 Solicitud de
+                                        Capacitación / Videollamada P2P</option>
+                                    <option value="Otro Motivo Técnico">📌 Otro Motivo Técnico</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Descripción Detallada del
+                                    Requerimiento</label>
+                                <textarea id="rep-desc" class="form-control rounded-3" rows="4"
+                                    placeholder="Explique con detalle su consulta o situación..." required></textarea>
+                            </div>
+
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="rep-requires-video">
+                                <label class="form-check-label small fw-bold text-dark" for="rep-requires-video">
+                                    🎥 Solicitar Videollamada (Jitsi) para asistencia técnica en vivo
+                                </label>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" onclick="switchSubTab('history')"
+                                    class="btn btn-light px-4 py-2 rounded-pill fw-bold">Ver Mis Fichas</button>
+                                <button type="submit"
+                                    class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-2">
+                                    <i class="bi bi-send-fill"></i> Crear Ficha
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-PESTAÑA B: SALA P2P -->
+            <div id="sub-pane-room" class="sub-pane">
+                <div class="support-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div>
+                            <h4 class="fw-bold m-0"><i class="bi bi-camera-video-fill text-success me-2"></i>Sala de
+                                Conferencia Satelital P2P</h4>
+                            <p class="small text-muted m-0">Conexión cifrada punto a punto para asesoría agronómica en
+                                vivo</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button onclick="switchSubTab('history')"
+                                class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
+                                <i class="bi bi-arrow-left me-1"></i> Volver al Listado
+                            </button>
+                            <button onclick="terminateRoom()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
+                                <i class="bi bi-telephone-x-fill me-1"></i> Salir de la Sala
+                            </button>
+                        </div>
+                    </div>
+                    <div id="meet-container">
+                        <div
+                            class="d-flex flex-column align-items-center justify-content-center h-100 p-5 text-center text-white">
+                            <div class="spinner-border text-success mb-3" role="status"></div>
+                            <h5 class="fw-bold">Esperando conexión...</h5>
+                            <p class="text-white-50 small">Selecciona una ficha en el listado y haz clic en "🎥 Sala"
+                                para iniciar o unirte a la videollamada.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-PESTAÑA C: HISTORIAL DE FICHAS -->
+            <div id="sub-pane-history" class="sub-pane">
+                <div class="support-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <div>
+                            <h4 class="fw-bold m-0"><i class="bi bi-folder-check text-primary me-2"></i>Registro y
+                                Seguimiento de Fichas</h4>
+                            <p class="small text-muted m-0">Monitoreo del SLA de 72 horas y herramientas de alerta por
+                                Gmail</p>
+                        </div>
+                        <button onclick="loadReports()" class="btn btn-light btn-sm rounded-pill px-3 fw-bold border">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Actualizar Listado
+                        </button>
+                    </div>
+
+                    <div id="reports-loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="small text-muted mt-2">Cargando base de datos de fichas...</p>
+                    </div>
+
+                    <div id="reports-empty" class="text-center py-5" style="display: none;">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <h5 class="fw-bold text-dark mt-3">No hay fichas registradas</h5>
+                        <p class="small text-muted">No se encontraron casos de soporte pendientes en tu jurisdicción o
+                            perfil.</p>
+                        <button onclick="switchSubTab('create')"
+                            class="btn btn-primary btn-sm rounded-pill px-4 mt-2">Crear Primera Ficha</button>
+                    </div>
+
+                    <div class="reports-table-container">
+                        <table id="reports-table" class="table-clean" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Fecha / Hora</th>
+                                    <th>Asunto y Descripción</th>
+                                    <th>Solicitante</th>
+                                    <th>Dirigido A</th>
+                                    <th>Estado / SLA</th>
+                                    <th>Resolución / Atendido Por</th>
+                                    <th class="text-end">Acciones de Soporte</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA PRINCIPAL 2: MANUAL DE USUARIO OFICIAL -->
+        <div id="main-pane-manual" class="main-pane">
+
+
+            <!-- Embed interactivo del manual -->
+            <div class="support-card p-0 overflow-hidden" style="height: 850px; border: 2px solid var(--border-color);">
+                <iframe src="manual_usuario.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/notification-service.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        let currentUser = null;
+        let jitsiApi = null;
+        let activeRoom = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.initLayout) await window.initLayout('soporte');
+
+            if (typeof EmailJSResponseStatus !== 'undefined' || typeof emailjs !== 'undefined') {
+                if (typeof CONFIG !== 'undefined' && CONFIG.EMAILJS_PUBLIC_KEY) {
+                    try { emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY); } catch (e) { }
+                }
+            }
+
+            if (window.AuthObj && window.AuthObj.getCurrentUser) {
+                currentUser = await window.AuthObj.getCurrentUser(true);
+            }
+
+            setupUserUI();
+
+            // Revisar parámetro URL para abrir pestaña específica
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam) {
+                switchMainTab(tabParam);
+            } else {
+                loadReports();
+            }
+        });
+
+        function setupUserUI() {
+            const roleBadge = document.getElementById('role-display-text');
+            const targetSelect = document.getElementById('rep-target');
+            const creatorNotice = document.getElementById('creator-notice-box');
+            const formWrapper = document.getElementById('ticket-form-wrapper');
+
+            if (!currentUser) {
+                if (roleBadge) roleBadge.textContent = 'Invitado / Campesino';
+                return;
+            }
+
+            if (document.getElementById('rep-name')) {
+                document.getElementById('rep-name').value = currentUser.full_name || currentUser.email || 'Agricultor';
+            }
+            if (document.getElementById('rep-role')) {
+                let roleLabel = 'Agricultor';
+                if (currentUser.role === 'ministry_admin') roleLabel = 'Administrador de Ministerio (País)';
+                if (currentUser.role === 'global_owner') roleLabel = 'Creador / Dueño Global (Atlas Digital)';
+                if (currentUser.role === 'org_admin') roleLabel = 'Administrador de Cooperativa';
+                document.getElementById('rep-role').value = roleLabel;
+            }
+            if (roleBadge) {
+                let roleLabel = 'Agricultor';
+                if (currentUser.role === 'ministry_admin') roleLabel = 'Admin Ministerio';
+                if (currentUser.role === 'global_owner') roleLabel = 'Creador Global';
+                roleBadge.textContent = roleLabel;
+            }
+
+            // Regla Estricta para Creadores/Dueños Globales
+            if (currentUser.role === 'global_owner') {
+                const btnCreate = document.getElementById('sub-tab-btn-create');
+                const btnRoom = document.getElementById('sub-tab-btn-room');
+                if (btnCreate) btnCreate.style.display = 'none';
+                if (btnRoom) btnRoom.style.display = 'none';
+
+                // Cambiar automáticamente a la pestaña de historial/registro oficial
+                setTimeout(() => switchSubTab('history'), 50);
+            }
+        }
+
+        function switchMainTab(tabId) {
+            document.querySelectorAll('.main-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.main-pane').forEach(pane => pane.classList.remove('active'));
+
+            const btn = document.getElementById('main-tab-btn-' + tabId);
+            const pane = document.getElementById('main-pane-' + tabId);
+
+            if (btn) btn.classList.add('active');
+            if (pane) pane.classList.add('active');
+
+            if (tabId === 'fichas') {
+                loadReports();
+            }
+        }
+
+        function switchSubTab(subId) {
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.sub-pane').forEach(pane => pane.classList.remove('active'));
+
+            const btn = document.getElementById('sub-tab-btn-' + subId);
+            const pane = document.getElementById('sub-pane-' + subId);
+
+            if (btn) btn.classList.add('active');
+            if (pane) pane.classList.add('active');
+
+            if (subId === 'history') {
+                loadReports();
+            }
+        }
+
+        async function handleCreateReport(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                Swal.fire('Atención', 'Debes iniciar sesión para crear una ficha de soporte.', 'warning');
+                return;
+            }
+
+            if (currentUser.role === 'global_owner') {
+                Swal.fire('Modo Creador', 'Los Creadores Globales no generan fichas; su rol es resolver incidencias escaladas.', 'info');
+                return;
+            }
+
+            const subject = document.getElementById('rep-subject').value;
+            const desc = document.getElementById('rep-desc').value;
+            const requiresVideo = document.getElementById('rep-requires-video').checked;
+
+            Swal.fire({
+                title: 'Generando Ficha...',
+                text: 'Registrando en base de datos y enrutando...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const reportPayload = {
+                    caller_id: currentUser.id,
+                    caller_name: currentUser.full_name || currentUser.email,
+                    caller_email: currentUser.email || '',
+                    caller_role: currentUser.role,
+                    country: currentUser.country_id || 'Global',
+                    subject: subject,
+                    description: desc,
+                    requires_video: requiresVideo
+                };
+
+                const newReport = await window.DB.createVideocallReport(reportPayload);
+
+                let successHtml = `<p class="text-muted small">Tu reporte se ha registrado con un SLA máximo de <strong>72 horas</strong>. Se ha notificado al equipo correspondiente.</p>`;
+
+                if (requiresVideo) {
+                    successHtml += `
+                        <div class="alert alert-success small text-start mt-2">
+                            <strong>Sala asignada:</strong> ${newReport.room_name}<br>
+                            <em>Puedes entrar a la sala de videollamada satelital ahora o esperar al administrador.</em>
+                        </div>
+                    `;
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Ficha # ' + String(newReport.id).slice(-6) + ' Creada!',
+                    html: successHtml,
+                    showCancelButton: true,
+                    confirmButtonText: requiresVideo ? '🎥 Entrar a Sala P2P Ahora' : '📋 Ver Mis Fichas',
+                    cancelButtonText: 'Cerrar',
+                    confirmButtonColor: '#10b981'
+                }).then((res) => {
+                    if (res.isConfirmed && requiresVideo) {
+                        joinRoom(newReport.room_name, newReport.subject);
+                    } else {
+                        switchSubTab('history');
+                    }
+                });
+
+                document.getElementById('rep-desc').value = '';
+                document.getElementById('rep-requires-video').checked = false;
+            } catch (err) {
+                Swal.fire('Error', 'No se pudo crear la ficha: ' + err.message, 'error');
+            }
+        }
+
+        async function loadReports() {
+            const loading = document.getElementById('reports-loading');
+            const empty = document.getElementById('reports-empty');
+            const table = document.getElementById('reports-table');
+            const tbody = document.getElementById('reports-tbody');
+
+            if (!loading || !empty || !table || !tbody) return;
+
+            loading.style.display = 'block';
+            empty.style.display = 'none';
+            table.style.display = 'none';
+
+            try {
+                let reports = [];
+                if (window.DB && typeof window.DB.getVideocallReports === 'function') {
+                    reports = await window.DB.getVideocallReports(currentUser);
+                }
+
+                loading.style.display = 'none';
+
+                if (!reports || reports.length === 0) {
+                    empty.style.display = 'block';
+                } else {
+                    tbody.innerHTML = '';
+                    const isAdminOrOwner = currentUser && (currentUser.role === 'global_owner' || currentUser.role === 'ministry_admin' || currentUser.is_superuser);
+
+                    reports.forEach(r => {
+                        const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString() + ' ' + new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Reciente';
+
+                        let statusHtml = '<span class="badge-status badge-status-open">Abierta</span>';
+                        if (r.status === 'in_progress') statusHtml = '<span class="badge-status badge-status-in_progress">En Proceso</span>';
+                        if (r.status === 'resolved') statusHtml = '<span class="badge-status badge-status-resolved">Resuelta</span>';
+                        if (r.status === 'closed') statusHtml = '<span class="badge-status badge-status-closed">Cerrada</span>';
+                        if (r.is_critical || r.status === 'critical') {
+                            statusHtml = '<span class="badge-status badge-status-critical animate__animated animate__pulse animate__infinite">🚨 CRÍTICA (> 72h)</span>';
+                        }
+
+                        let targetTxt = 'Gobierno';
+                        if (r.target_role === 'global_owner') targetTxt = 'AgroSmart Corp';
+                        if (r.target_role === 'org_admin') targetTxt = 'Cooperativa';
+                        if (r.is_escalated) targetTxt += ' (⚡ Escalado)';
+
+                        // Botones de acción adicionales para Admins y Creadores
+                        let adminButtons = '';
+                        const isFarmer = !isAdminOrOwner && currentUser.role !== 'org_admin';
+                        const isAdminView = isAdminOrOwner || currentUser.role === 'org_admin';
+
+                        if (isAdminView && !r.assigned_to && r.status !== 'resolved' && r.status !== 'closed' && String(r.caller_id) !== String(currentUser.id)) {
+                            adminButtons += `
+                                <button onclick="takeTicket('${r.id}')" class="btn-action-sm btn-action-resolve" title="Tomar este caso">
+                                    <i class="bi bi-person-check-fill"></i> Tomar Caso
+                                </button>
+                            `;
+                        }
+
+                        if (isAdminView && r.status !== 'resolved' && r.status !== 'closed' && String(r.assigned_to) === String(currentUser.id)) {
+                            if (currentUser.role === 'org_admin' || currentUser.role === 'ministry_admin') {
+                                adminButtons += `
+                                    <button onclick="escalateTicket('${r.id}')" class="btn-action-sm btn-action-escalate" title="Escalar incidencia al siguiente nivel">
+                                        <i class="bi bi-arrow-up-right-circle-fill"></i> Escalar
+                                    </button>
+                                `;
+                            }
+                        }
+
+                        let videoCallBtn = '';
+                        if (r.requires_video && (String(r.caller_id) === String(currentUser.id) || String(r.assigned_to) === String(currentUser.id))) {
+                            videoCallBtn = `<button onclick="joinRoom('${r.room_name}', '${(r.subject || '').replace(/'/g, "")}')" class="btn-action-sm btn-action-room" title="Entrar a Sala P2P">🎥 Sala</button>`;
+                        }
+
+                        const historyBtn = `<button onclick="viewTicketHistory('${r.id}')" class="btn-action-sm btn-action-gmail" title="Ver Historial"><i class="bi bi-clock-history"></i> Historial</button>`;
+                        const manageBtn = (isAdminView && String(r.assigned_to) === String(currentUser.id)) || (String(r.caller_id) === String(currentUser.id)) ? `<button onclick="openResolveModal('${r.id}', '${(r.subject || '').replace(/'/g, "")}')" class="btn-action-sm btn-action-resolve" title="Registrar Conclusión">📝 Gestionar</button>` : '';
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="small text-muted fw-bold">${dateStr}</td>
+                            <td>
+                                <div class="fw-bold text-dark">${r.subject || 'Sin asunto'} ${r.requires_video ? '<i class="bi bi-camera-video-fill text-primary" title="Requiere videollamada"></i>' : ''}</div>
+                                <div class="small text-muted">${(r.description || '').slice(0, 55)}...</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border px-2 py-1">${r.caller_name || 'Usuario'}</span></td>
+                            <td class="small fw-bold text-primary">${targetTxt}</td>
+                            <td>${statusHtml}</td>
+                            <td>
+                                <div class="small fw-bold text-success">${r.assigned_to ? 'Asignado a: ' + (r.attended_by_name || 'Admin') : 'Pendiente Asignación'}</div>
+                                <div class="small text-muted fst-italic">${r.resolution_notes || ''}</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end flex-wrap gap-1">
+                                    ${manageBtn}
+                                    ${videoCallBtn}
+                                    ${adminButtons}
+                                    ${historyBtn}
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    table.style.display = 'table';
+                }
+            } catch (err) {
+                loading.style.display = 'none';
+                empty.style.display = 'block';
+            }
+        }
+
+        window.joinRoom = function (roomName, subject = "Atención de Caso") {
+            if (!roomName) return;
+            startMeeting(roomName, subject);
+            switchSubTab('room');
+        };
+
+        function startMeeting(roomName, subject) {
+            const container = document.getElementById('meet-container');
+            if (!container) return;
+            container.innerHTML = '';
+            activeRoom = roomName;
+
+            const domain = 'meet.jit.si';
+            const options = {
+                roomName: roomName,
+                width: '100%',
+                height: 700,
+                parentNode: container,
+                userInfo: {
+                    displayName: currentUser ? (currentUser.full_name || currentUser.email) : 'Usuario AgroSmart'
+                },
+                configOverwrite: {
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: false,
+                    prejoinPageEnabled: false
+                },
+                interfaceConfigOverwrite: {
+                    APP_NAME: 'AgroSmart Video Support',
+                    DEFAULT_REMOTE_DISPLAY_NAME: 'Asesor Satelital'
+                }
+            };
+
+            try {
+                if (jitsiApi) jitsiApi.dispose();
+                jitsiApi = new JitsiMeetExternalAPI(domain, options);
+            } catch (err) {
+                container.innerHTML = `
+                    <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 text-center text-white">
+                        <div class="fs-1 mb-3 text-warning">⚠️</div>
+                        <h4 class="fw-bold">Sala P2P Activa en Modo Simplificado</h4>
+                        <p class="text-white-50">Sala: <strong>${roomName}</strong> (${subject}). Tu ficha está en línea.</p>
+                        <button onclick="switchSubTab('history')" class="btn btn-primary px-4 py-2 rounded-pill fw-bold mt-3">Volver al Listado</button>
+                    </div>
+                `;
+            }
+        }
+
+        function terminateRoom() {
+            if (jitsiApi) {
+                jitsiApi.dispose();
+                jitsiApi = null;
+            }
+            activeRoom = null;
+            const container = document.getElementById('meet-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 text-center text-white">
+                        <i class="bi bi-telephone-slash fs-1 text-danger mb-3"></i>
+                        <h4 class="fw-bold">Videollamada Finalizada</h4>
+                        <p class="text-white-50 small">La sesión de asistencia P2P ha sido cerrada. Recuerda registrar la conclusión en la tabla de fichas.</p>
+                        <button onclick="switchSubTab('history')" class="btn btn-primary btn-sm rounded-pill px-4 mt-2">Ver Listado de Fichas</button>
+                    </div>
+                `;
+            }
+        }
+
+        window.openResolveModal = async function (reportId, subjectText) {
+            if (!window.Swal) return;
+
+            const { value: formValues } = await Swal.fire({
+                title: '📋 Conclusión de Ficha # ' + String(reportId).slice(-6),
+                html: `
+                    <div class="text-start mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Asunto del Caso</label>
+                        <input type="text" class="form-control bg-light" value="${subjectText}" disabled>
+                    </div>
+                    <div class="text-start mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Estado de la Ficha</label>
+                        <select id="swal-status" class="form-select fw-bold text-primary">
+                            <option value="resolved">✅ Resuelta / Concluida</option>
+                            <option value="in_progress">⏳ En Proceso de Seguimiento</option>
+                            <option value="closed">🔒 Cerrada sin Acción</option>
+                        </select>
+                    </div>
+                    <div class="text-start mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Conclusión / Acuerdos de la Sesión</label>
+                        <textarea id="swal-notes" class="form-control" rows="4" placeholder="Describe los acuerdos técnicos, recomendaciones de fertilización o solución dada al usuario..."></textarea>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar Conclusión',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#10b981',
+                preConfirm: () => {
+                    return {
+                        status: document.getElementById('swal-status').value,
+                        notes: document.getElementById('swal-notes').value
+                    }
+                }
+            });
+
+            if (formValues && formValues.notes) {
+                try {
+                    await window.DB.updateVideocallReport(reportId, {
+                        status: formValues.status,
+                        resolution_notes: formValues.notes,
+                        attended_by_name: currentUser ? (currentUser.full_name || currentUser.email) : 'Administrador',
+                        updated_at: new Date().toISOString()
+                    });
+                    Swal.fire('¡Registrado!', 'La conclusión de la ficha ha sido guardada.', 'success');
+                    loadReports();
+                } catch (e) {
+                    Swal.fire('Error', 'No se pudo guardar: ' + e.message, 'error');
+                }
+            }
+        };
+
+        window.sendCallAlertEmail = async function (reportId, callerName, callerEmail, subjectText) {
+            Swal.fire({
+                title: '¿Alertar al usuario por Gmail?',
+                html: `Se enviará un correo automático indicando a <strong>${callerName}</strong> que ya te encuentras en la sala de videollamada para el caso <em>"${subjectText}"</em>, con una ventana de <strong>5 a 10 minutos</strong> para ingresar.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '🔔 Sí, Enviar Alerta Gmail',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#dc2626'
+            }).then(async (res) => {
+                if (res.isConfirmed) {
+                    Swal.fire({
+                        title: 'Disparando Alerta por Correo...',
+                        text: 'Conectando con servidor EmailJS y notificando al usuario.',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    try {
+                        await window.DB.notifyTicketEmail({
+                            id: reportId,
+                            caller_name: callerName,
+                            caller_email: callerEmail || 'usuario@gmail.com',
+                            caller_role: 'farmer',
+                            subject: subjectText
+                        }, 'call_alert');
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Alerta de Sala Enviada!',
+                            html: `El usuario <strong>${callerName}</strong> ha sido notificado por Gmail.<br><span class="small text-muted">El temporizador de 5-10 minutos está corriendo en su bandeja de entrada.</span>`,
+                            confirmButtonColor: '#10b981'
+                        });
+                    } catch (e) {
+                        Swal.fire('Atención', 'Alerta enviada localmente o con aviso offline.', 'info');
+                    }
+                }
+            });
+        };
+
+        window.takeTicket = async function (reportId) {
+            Swal.fire({
+                title: '¿Tomar este caso?',
+                text: 'Asignarás este caso a tu perfil y será tu responsabilidad resolverlo. Desaparecerá de la bandeja de otros administradores.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, Tomar Caso',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#10b981'
+            }).then(async (res) => {
+                if (res.isConfirmed) {
+                    try {
+                        await window.DB.assignVideocallReport(reportId, currentUser);
+                        Swal.fire('¡Asignado!', 'El caso ha sido asignado a ti.', 'success');
+                        loadReports();
+                    } catch (e) {
+                        Swal.fire('Error', 'No se pudo tomar el caso: ' + e.message, 'error');
+                    }
+                }
+            });
+        };
+
+        window.viewTicketHistory = async function (reportId) {
+            try {
+                let reports = [];
+                if (window.DB && typeof window.DB.getVideocallReports === 'function') {
+                    reports = await window.DB.getVideocallReports(currentUser); // Includes the ones we can see
+                }
+                let report = reports.find(r => r.id == reportId);
+                if (!report && window.DB.supabase) {
+                    // Try to fetch specific if not in filtered list
+                    const { data } = await window.DB.supabase.from('videocall_reports').select('*').eq('id', reportId).single();
+                    if (data) report = data;
+                }
+                if (!report && window.DB.getLocalDB) {
+                    const localDB = window.DB.getLocalDB();
+                    report = localDB.videocall_reports?.find(r => r.id == reportId);
+                }
+
+                if (!report || !report.history || report.history.length === 0) {
+                    Swal.fire('Historial', 'No hay historial registrado para esta ficha.', 'info');
+                    return;
+                }
+
+                let historyHtml = '<ul class="list-group text-start shadow-sm mb-3">';
+                report.history.forEach(h => {
+                    const d = new Date(h.timestamp);
+                    const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    let actionText = '';
+                    if (h.action === 'created') actionText = `📝 <strong>Creado</strong> por usuario ID: ${h.by}`;
+                    if (h.action === 'assigned') actionText = `👤 <strong>Asignado</strong> a Admin ID: ${h.by}`;
+                    if (h.action === 'escalated') actionText = `⚡ <strong>Escalado</strong> a nivel ${h.to} por Admin ID: ${h.by}`;
+
+                    historyHtml += `
+                        <li class="list-group-item bg-light border-0 mb-1 rounded">
+                            <div class="small text-muted mb-1"><i class="bi bi-clock"></i> ${dateStr}</div>
+                            <div class="fs-6">${actionText}</div>
+                        </li>
+                    `;
+                });
+                historyHtml += '</ul>';
+
+                Swal.fire({
+                    title: 'Historial de la Ficha # ' + String(reportId).slice(-6),
+                    html: historyHtml,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: '#6c757d'
+                });
+            } catch (e) {
+                Swal.fire('Error', 'No se pudo cargar el historial: ' + e.message, 'error');
+            }
+        };
+
+        window.escalateTicket = async function (reportId) {
+            Swal.fire({
+                title: '¿Escalar ficha al siguiente nivel?',
+                text: 'Esta acción notificará al equipo correspondiente (Ministerio o Creadores Globales) para que intervengan en la solución.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '⚡ Sí, Escalar Ahora',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#f59e0b'
+            }).then(async (res) => {
+                if (res.isConfirmed) {
+                    try {
+                        await window.DB.escalateVideocallReport(reportId, currentUser);
+                        Swal.fire('¡Escalado!', 'El caso ha sido escalado exitosamente.', 'success');
+                        loadReports();
+                    } catch (e) {
+                        Swal.fire('Error', 'No se pudo escalar: ' + e.message, 'error');
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>

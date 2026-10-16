@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestros Servicios - AgroSmart Global</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Modern CSS -->
+    <link rel="stylesheet" href="css/modern_agro.css">
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <main class="container py-5 mt-4">
+        <!-- New Premium Hero -->
+        <section class="service-hero text-center animate-slide-up">
+            <div class="hero-content">
+                <div class="hero-badge mb-4">
+                    <span class="badge rounded-pill bg-white text-success px-4 py-2 text-uppercase fw-bold shadow-sm">Infraestructura Nacional</span>
+                </div>
+                <h1 class="display-3 fw-800 text-white mb-3">Soluciones a Escala Global</h1>
+                <p class="lead text-white opacity-90 mx-auto mb-0" style="max-width: 800px;">
+                    Transformamos el panorama agrícola mediante tecnología de punta adaptada a las necesidades de estados y grandes corporaciones.
+                </p>
+            </div>
+        </section>
+
+        <!-- Carga y Estado del Usuario -->
+        <div id="service-loading-state" class="text-center py-5 my-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted">Comprobando elegibilidad...</p>
+        </div>
+
+        <div id="admin-already-active-state" class="alert border-0 shadow-sm rounded-4 p-5 text-center mb-5 animate-slide-up" style="display: none; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
+            <div id="plan-icon-container" class="fs-1 mb-3">🛡️</div>
+            <h2 id="plan-status-title" class="fw-bold mt-2 mb-2 text-dark">Plan Activo en tu Región</h2>
+            <p id="plan-status-desc" class="lead text-muted mb-4">Tu cuenta disfruta de los beneficios del plan contratado para tu país.</p>
+            
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <div class="p-3 bg-white rounded-4 shadow-sm border border-light" style="min-width: 200px;">
+                    <div class="info-label text-uppercase mb-1" style="font-size: 10px; letter-spacing: 1px;">Nivel de Servicio</div>
+                    <div id="display-plan-name" class="fs-5 fw-800 text-agro-primary">---</div>
+                </div>
+                <div class="p-3 bg-white rounded-4 shadow-sm border border-light" style="min-width: 200px;">
+                    <div class="info-label text-uppercase mb-1" style="font-size: 10px; letter-spacing: 1px;">Miembro Desde</div>
+                    <div id="display-join-date" class="fs-5 fw-800 text-dark">---</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solutions Grid & Pricing -->
+        <div id="pricing-section-container" style="display: none;" class="animate-slide-up">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold fs-1">¿Aún no tienes un plan?</h2>
+                <p class="text-muted lead">Potencia tu gestión agrícola con nuestras soluciones corporativas para países y cooperativas.</p>
+            </div>
+
+            <!-- Precios (Tarjetas) -->
+            <div class="row g-4 mb-5 justify-content-center">
+                
+                <!-- Bronce -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100 rounded-4 transition-all hover-shadow">
+                        <div class="card-body p-4 text-center d-flex flex-column">
+                            <div class="icon-box-v2 bg-light text-secondary shadow-sm mb-3 mx-auto" style="width: 50px; height: 50px; font-size: 20px;">
+                                <i class="bi bi-award"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-1">Bronce</h4>
+                            <div class="mb-4">
+                                <span class="fs-1 fw-900 text-dark">$350</span><span class="text-muted fw-bold">/mes</span>
+                            </div>
+                            <button class="btn btn-agro-outline w-100 py-3 rounded-pill fw-bold mt-auto" onclick="handleServiceClick('bronce')">Contactar Entidad</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platinium -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100 rounded-4 transition-all hover-shadow" style="border-top: 5px solid #6c757d !important;">
+                        <div class="card-body p-4 text-center d-flex flex-column">
+                            <div class="icon-box-v2 text-white shadow-sm mb-3 mx-auto" style="width: 50px; height: 50px; font-size: 20px; background: linear-gradient(135deg, #a8aaad 0%, #6c757d 100%);">
+                                <i class="bi bi-gem"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-1">Platinium</h4>
+                            <div class="mb-4">
+                                <span class="fs-1 fw-900 text-dark">$750</span><span class="text-muted fw-bold">/mes</span>
+                            </div>
+                            <button class="btn btn-secondary w-100 py-3 rounded-pill fw-bold mt-auto text-white shadow-sm" onclick="handleServiceClick('platinium')" style="background: #6c757d; border: none;">Contactar Entidad</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diamante -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow h-100 rounded-4 position-relative transition-all hover-shadow" style="border-top: 5px solid var(--primary-color) !important; transform: scale(1.03); z-index: 10;">
+                        <div class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-success px-3 py-2 shadow-sm text-uppercase" style="font-size: 10px; letter-spacing: 1px;">Mejor Valor</div>
+                        <div class="card-body p-4 text-center d-flex flex-column mt-2">
+                            <div class="icon-box-v2 bg-success text-white shadow-sm mb-3 mx-auto" style="width: 60px; height: 60px; font-size: 26px;">
+                                <i class="bi bi-diamond-fill"></i>
+                            </div>
+                            <h4 class="fw-bold text-success mb-1">Diamante</h4>
+                            <div class="mb-4 text-success">
+                                <span class="fs-1 fw-900">$1500</span><span class="fw-bold opacity-75">/mes</span>
+                            </div>
+                            <button class="btn btn-agro-primary w-100 py-3 rounded-pill fw-bold mt-auto shadow" onclick="handleServiceClick('diamante')">Contactar Entidad</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Esmeralda -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100 rounded-4 transition-all hover-shadow bg-dark text-white" style="border-top: 5px solid #20c997 !important;">
+                        <div class="card-body p-4 text-center d-flex flex-column">
+                            <div class="icon-box-v2 bg-white text-dark shadow-sm mb-3 mx-auto" style="width: 50px; height: 50px; font-size: 20px;">
+                                <i class="bi bi-globe-americas"></i>
+                            </div>
+                            <h4 class="fw-bold text-white mb-1">Esmeralda</h4>
+                            <div class="mb-4 text-white">
+                                <span class="fs-1 fw-900">$3000</span><span class="text-white-50 fw-bold">/mes</span>
+                            </div>
+                            <button class="btn w-100 py-3 rounded-pill fw-bold mt-auto text-dark shadow-sm" onclick="handleServiceClick('esmeralda')" style="background: #20c997;">Contactar Global Owner</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Comparativa -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover align-middle text-center mb-0" style="min-width: 800px;">
+                        <thead class="bg-light border-bottom text-muted small text-uppercase" style="letter-spacing: 1px;">
+                            <tr>
+                                <th class="text-start py-4 ps-4 w-25">Características</th>
+                                <th class="py-4 fw-bold">Bronce</th>
+                                <th class="py-4 fw-bold">Platinium</th>
+                                <th class="py-4 bg-success bg-opacity-10 text-success fw-bold">Diamante</th>
+                                <th class="py-4 bg-dark text-white fw-bold">Esmeralda</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fs-6">
+                            <tr>
+                                <td class="text-start py-3 ps-4 text-muted fw-500"><i class="bi bi-people-fill me-2 text-secondary"></i>Límite de Agricultores</td>
+                                <td class="py-3 fw-bold">1,000</td>
+                                <td class="py-3 fw-bold">2,500</td>
+                                <td class="py-3 bg-success bg-opacity-10 fw-bold">5,000</td>
+                                <td class="py-3 bg-dark text-white fw-bold">Ilimitado</td>
+                            </tr>
+                            <tr class="border-top border-light">
+                                <td class="text-start py-3 ps-4 text-muted fw-500"><i class="bi bi-diagram-3-fill me-2 text-secondary"></i>Cooperativas Asignables</td>
+                                <td class="py-3 fw-bold">3</td>
+                                <td class="py-3 fw-bold">10</td>
+                                <td class="py-3 bg-success bg-opacity-10 fw-bold">25</td>
+                                <td class="py-3 bg-dark text-white fw-bold">Ilimitado</td>
+                            </tr>
+                            <tr class="border-top border-light">
+                                <td class="text-start py-3 ps-4 text-muted fw-500"><i class="bi bi-speedometer2 me-2 text-secondary"></i>Manejo de Panel de Administrador</td>
+                                <td class="py-3"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-dark text-white"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                            </tr>
+                            <tr class="border-top border-light">
+                                <td class="text-start py-3 ps-4 text-muted fw-500"><i class="bi bi-geo-alt-fill me-2 text-secondary"></i>Alertas Satelitales Locales</td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-dark text-white"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                            </tr>
+                            <tr class="border-top border-light">
+                                <td class="text-start py-3 ps-4 text-muted fw-500"><i class="bi bi-headset me-2 text-secondary"></i>Soporte Prioritario (Videollamada)</td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-dark text-white"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                            </tr>
+                            <tr class="border-top border-light">
+                                <td class="text-start py-3 ps-4 text-muted fw-500"><i class="bi bi-map-fill me-2 text-secondary"></i>Jurisdicción de País Completo</td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3 bg-dark text-white"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                            </tr>
+                            <tr class="border-top border-light">
+                                <td class="text-start py-3 ps-4 text-muted fw-bold"><i class="bi bi-globe-americas me-2" style="color: var(--primary-color);"></i>Red Social (AgroRed)</td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                                <td class="py-3 bg-dark text-white"><i class="bi bi-check-lg text-success fs-5"></i></td>
+                            </tr>
+                            <tr class="border-top border-light" style="background: rgba(16, 185, 129, 0.05);">
+                                <td class="text-start py-3 ps-4 fw-bold text-success"><i class="bi bi-robot me-2"></i>Agro IA (Modo Chat)</td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10 fw-bold"><i class="bi bi-check-circle-fill text-success fs-5"></i> Integrado</td>
+                                <td class="py-3 bg-dark text-white fw-bold"><i class="bi bi-check-circle-fill text-success fs-5"></i> Integrado</td>
+                            </tr>
+                            <tr class="border-top border-light" style="background: rgba(16, 185, 129, 0.05);">
+                                <td class="text-start py-3 ps-4 fw-bold text-success"><i class="bi bi-mic-fill me-2"></i>Asistente de Voz Jarvis <span class="badge bg-info text-dark ms-2" style="font-size:0.65rem;">Powered by ElevenLabs AI</span></td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3 bg-success bg-opacity-10"><i class="bi bi-x-lg text-danger fs-5 opacity-50"></i></td>
+                                <td class="py-3 bg-dark text-white fw-bold"><i class="bi bi-check-circle-fill text-success fs-5"></i> Integrado (Voz HD)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agro IA Promo Section (G0DM0D3 Tiers) -->
+        <section class="mt-5 pt-4 text-center animate-slide-up">
+            <div class="p-5 rounded-4 shadow-sm border position-relative overflow-hidden" style="background: rgba(10, 15, 20, 0.95); border-color: rgba(16, 185, 129, 0.4) !important;">
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(16,185,129,0.1), transparent 50%); z-index: 0;"></div>
+                
+                <div class="position-relative" style="z-index: 1;">
+                    <div class="badge bg-success mb-3 px-3 py-2 text-uppercase" style="letter-spacing: 1px;">Arquitectura G0DM0D3 Integrada</div>
+                    <h2 class="fw-bold mb-3 text-white"><i class="bi bi-cpu-fill text-success"></i> Ecosistema de Inteligencia Artificial</h2>
+                    <p class="text-white-50 mb-5 mx-auto" style="max-width: 800px; font-size: 1.1rem;">
+                        No nos limitamos a un solo modelo. Hemos integrado el motor <strong>G0DM0D3</strong>, dándote acceso exclusivo a la red neuronal agro-tecnológica más extensa del planeta con los 55 modelos más avanzados del mundo, divididos por potencia.
+                    </p>
+
+                    <!-- Tiers Grid -->
+                    <div class="row g-3 text-start justify-content-center">
+                        <!-- FAST Tier -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="p-3 rounded-3 h-100" style="background: rgba(100, 30, 30, 0.4); border: 1px solid rgba(255, 99, 71, 0.3);">
+                                <h6 class="text-danger fw-bold mb-3"><i class="bi bi-lightning-charge-fill"></i> FAST (1-10)</h6>
+                                <ul class="list-unstyled small text-white-50 mb-0 lh-lg" style="font-size: 0.8rem;">
+                                    <li>Gemini 2.5 Flash</li><li>DeepSeek V3</li><li>Perplexity Sonar</li><li>Llama 3.1 8B</li><li>Kimi K2.5</li><li>Grok Code Fast</li><li>MiMo-V2 Flash</li><li>GPT-OSS 20B</li><li>Step 3.5 Flash</li><li>Nemotron 3 Nano</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- STANDARD Tier -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="p-3 rounded-3 h-100" style="background: rgba(100, 70, 0, 0.4); border: 1px solid rgba(255, 165, 0, 0.3);">
+                                <h6 class="text-warning fw-bold mb-3"><i class="bi bi-bullseye"></i> +STANDARD (11-24)</h6>
+                                <ul class="list-unstyled small text-white-50 mb-0 lh-lg" style="font-size: 0.8rem;">
+                                    <li>Claude 3.5 Sonnet</li><li>Llama 4 Scout</li><li>DeepSeek V3.2</li><li>Hermes 3 70B</li><li>GPT-4o</li><li>Gemini 2.5 Pro</li><li>Claude Sonnet 4.6</li><li>Mixtral 8x22B</li><li>Llama 3.3 70B</li><li>Qwen 2.5 72B</li><li>Hermes 4 70B</li><li>GLM-5 Turbo</li><li>Mistral Medium 3.1</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- SMART Tier -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="p-3 rounded-3 h-100" style="background: rgba(70, 30, 100, 0.4); border: 1px solid rgba(147, 112, 219, 0.3);">
+                                <h6 class="fw-bold mb-3" style="color: #b19cd9;"><i class="bi bi-brain"></i> +SMART (25-38)</h6>
+                                <ul class="list-unstyled small text-white-50 mb-0 lh-lg" style="font-size: 0.8rem;">
+                                    <li>Gemma 3 27B</li><li>GPT-5.4 Chat</li><li>Qwen 3.5 Plus</li><li>GLM-5</li><li>GPT-5.2</li><li>Gemini 3 Pro</li><li>Claude Opus 4.6</li><li>GPT-OSS 120B</li><li>DeepSeek R1</li><li>Nemotron 3 Super</li><li>Llama 3.1 405B</li><li>Hermes 4 405B</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- POWER Tier -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="p-3 rounded-3 h-100" style="background: rgba(100, 50, 20, 0.4); border: 1px solid rgba(210, 105, 30, 0.3);">
+                                <h6 class="fw-bold mb-3" style="color: #ff8c00;"><i class="bi bi-tools"></i> +POWER (39-49)</h6>
+                                <ul class="list-unstyled small text-white-50 mb-0 lh-lg" style="font-size: 0.8rem;">
+                                    <li>Hermes 3 405B</li><li>Grok 4</li><li>GLM-4.7</li><li>Llama 4 Maverick</li><li>Qwen3 235B</li><li>Qwen3 Coder 480B</li><li>MiniMax M2.5</li><li>MiMo-V2 Pro</li><li>Mistral Large 3</li><li>Gemini 3 Flash</li><li>Kimi K2</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- ULTRA Tier -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="p-3 rounded-3 h-100" style="background: rgba(100, 90, 20, 0.4); border: 1px solid rgba(255, 215, 0, 0.3);">
+                                <h6 class="fw-bold mb-3" style="color: #ffd700;"><i class="bi bi-gem"></i> +ULTRA (50-55)</h6>
+                                <ul class="list-unstyled small text-white-50 mb-0 lh-lg" style="font-size: 0.8rem;">
+                                    <li>Grok 4 Fast</li><li>Grok 4.1 Fast</li><li>Claude Opus 4</li><li>Qwen 2.5 Coder 32B</li><li>QwQ 32B</li><li>Codestral 250B</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 badge px-4 py-3 fs-6 shadow text-uppercase" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); letter-spacing: 1px;">
+                        <i class="bi bi-shield-check me-2"></i> Acceso Total y Exclusivo del Plan Esmeralda
+                    </div>
+
+                    <div class="mt-4 p-4 rounded-4 text-start border border-info bg-dark bg-opacity-75 shadow-sm mx-auto" style="max-width: 900px;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="fs-1 text-info"><i class="bi bi-award-fill"></i></div>
+                            <div>
+                                <h5 class="fw-bold text-white mb-1">Membresías y Créditos Oficiales en Uso</h5>
+                                <p class="small text-white-50 mb-0">
+                                    Nuestra arquitectura opera utilizando créditos y beneficios oficiales de nivel empresarial: <strong>OpenAI Códice (Codex - Créditos $100 USD)</strong>, <strong>API de OpenAI GPT-4o ($50 USD Créditos)</strong> como IA Madre del ecosistema, licencias de síntesis neural de <strong>ElevenLabs AI</strong> para voz humana hiperrealista, y flujos automatizados con <strong>n8n Pro ($60 USD - 1 mes)</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Jarvis Marketing Section -->
+        <section class="mt-5 pt-4 text-center animate-slide-up">
+            <div class="jarvis-marketing-card p-5 rounded-4 shadow-lg border">
+                <div class="position-relative" style="z-index: 1;">
+                    <div class="icon-circle bg-dark text-white mx-auto shadow-sm mb-4 border border-success" style="width: 80px; height: 80px; font-size: 36px; animation: pulseSoft 2s infinite;">
+                        <i class="bi bi-mic-fill" style="text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);"></i>
+                    </div>
+                    <div class="badge mb-3 px-3 py-2 text-uppercase text-white border border-success" style="background: rgba(16, 185, 129, 0.2); backdrop-filter: blur(5px); letter-spacing: 1px;">Inteligencia Madre Exclusiva</div>
+                    <div class="badge mb-3 ms-2 px-3 py-2 text-uppercase text-dark bg-info fw-bold shadow-sm" style="letter-spacing: 1px;"><i class="bi bi-broadcast me-1"></i> Voz Hiperrealista ElevenLabs AI</div>
+                    <h2 class="fw-bold mb-3 text-white display-5" style="text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Conoce a <span class="text-success">Jarvis</span></h2>
+                    <p class="text-white-50 mb-5 mx-auto" style="max-width: 800px; font-size: 1.2rem; line-height: 1.6;">
+                        El primer asistente agrícola global por voz, impulsado por síntesis neural hiperrealista de <strong class="text-info">ElevenLabs AI</strong> y el cerebro de la <strong class="text-success">IA Madre OpenAI GPT-4o / Códice (Codex)</strong>. Di <strong class="text-white">"Hey Jarvis"</strong> y controla absolutamente todo el sistema sin tocar una pantalla.
+                    </p>
+
+                    <div class="row g-4 text-start justify-content-center">
+                        <div class="col-md-4">
+                            <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+                                <h5 class="text-white fw-bold mb-3"><i class="bi bi-soundwave text-success me-2"></i>Control por Voz</h5>
+                                <p class="text-white-50 small mb-0">Reconocimiento continuo y natural. Dile a Jarvis qué hacer y él navegará, creará cultivos y gestionará el sistema por ti en tiempo real.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+                                <h5 class="text-white fw-bold mb-3"><i class="bi bi-cpu text-success me-2"></i>Cerebro G0DM0D3</h5>
+                                <p class="text-white-50 small mb-0">Jarvis está impulsado por la red neuronal G0DM0D3, lo que le permite entender contextos complejos y dar respuestas lógicas de nivel experto.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+                                <h5 class="text-white fw-bold mb-3"><i class="bi bi-universal-access-circle text-success me-2"></i>Accesibilidad 100%</h5>
+                                <p class="text-white-50 small mb-0">Ideal para agricultores en el campo que no pueden teclear o tienen dificultades de lectura. Jarvis habla, escucha y ejecuta.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button class="btn btn-outline-success px-5 py-3 rounded-pill fw-bold text-white shadow-sm" style="border-width: 2px;" onclick="handleServiceClick('esmeralda')">
+                            Desbloquear con Plan Esmeralda
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="mt-5 pt-4 text-center animate-slide-up">
+            <div class="p-5 rounded-4 shadow-sm border-0" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                <h3 class="fw-bold mb-3">¿Necesitas una solución personalizada?</h3>
+                <p class="text-muted mb-4 mx-auto" style="max-width: 600px;">Nuestro equipo de expertos en AgroSmart Corporation está listo para ayudarte a digitalizar tu sector agrícola a escala nacional.</p>
+                <a href="contact.html?subject=Contacto con AgroSmart Corporation" class="btn btn-dark px-5 py-3 rounded-pill fw-bold shadow-sm text-decoration-none">
+                    <i class="bi bi-chat-dots me-2"></i>Contactar a AgroSmart Corporation
+                </a>
+            </div>
+        </section>
+
+        <!-- Global Strategy Stats -->
+        <section class="service-card-v2 animate-slide-up animate-delay-3">
+            <div class="row align-items-center text-center text-md-start">
+                <div class="col-md-8">
+                    <h2 class="fw-800 mb-4">Nuestra Visión Estratégica</h2>
+                    <p class="text-muted lead mb-5">
+                        Digitalizamos la agricultura global país por país, convirtiendo los datos satelitales en acciones concretas que garantizan la seguridad alimentaria mundial.
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <div class="stat-item-v2">
+                                <h3 class="fw-800 text-agro-primary mb-0">100%</h3>
+                                <p class="small text-muted mb-0">Seguridad</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item-v2">
+                                <h3 class="fw-800 text-agro-primary mb-0">Global</h3>
+                                <p class="small text-muted mb-0">Alcance</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item-v2">
+                                <h3 class="fw-800 text-agro-primary mb-0">Enterprise</h3>
+                                <p class="small text-muted mb-0">Soporte</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 d-none d-md-block text-center text-agro-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" fill="currentColor" class="bi bi-globe-americas animate-float" viewBox="0 0 16 16">
+                        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2.04 4.326c.325 1.329 2.532 2.54 3.717 3.19.48.263.793.434.743.484-.08.08-.162.158-.242.234-.416.396-.787.749-.758 1.266.035.634.618.824 1.214 1.017.577.188 1.168.38 1.286.983.082.417-.075.988-.22 1.52-.215.782-.406 1.48.22 1.48 1.5-.5 3.798-3.186 4-5 .138-1.243-2-2-3.5-2.5-.478-.16-.755.081-.99.284-.172.15-.322.279-.51.216-.445-.148-2.5-2-1.5-2.5.78-.39.952-.171 1.227.182.078.099.163.208.273.318.609.304.662-.132.723-.633.039-.322.081-.671.277-.867.434-.434 1.265-.791 2.028-1.12.712-.306 1.365-.587 1.579-.88A7 7 0 1 1 2.04 4.327Z"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer py-5 mt-5 border-top">
+        <div class="container text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-2 small">
+                <a href="index.html" class="text-muted text-decoration-none">Inicio</a> &bull;
+                <a href="privacy.html" class="text-muted text-decoration-none">Política de Privacidad</a> &bull;
+                <a href="data-deletion.html" class="text-muted text-decoration-none">Eliminación de Datos</a> &bull;
+                <a href="terms.html" class="text-muted text-decoration-none">Términos de Servicio</a> &bull;
+                <a href="soporte.html" class="text-muted text-decoration-none">Soporte</a>
+            </div>
+            <p class="text-muted mb-0 small">© 2026 AgroSmart Global - Una división de Smart Enterprise. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Config & Layout -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.handleServiceClick = function(planType) {
+            const planNameFormated = planType.charAt(0).toUpperCase() + planType.slice(1);
+            window.location.href = `contact.html?subject=Informacion sobre el Plan ${planNameFormated}`;
+        };
+
+        window.contactCorporation = function() {
+            window.location.href = `contact.html?subject=Contacto con AgroSmart Corporation`;
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.initLayout) window.initLayout();
+
+            const loadingState = document.getElementById('service-loading-state');
+            const pricingSection = document.getElementById('pricing-section-container');
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 300));
+                loadingState.style.display = 'none';
+                pricingSection.style.display = 'block';
+            } catch (err) {
+                console.warn("Error in services initialization:", err);
+                loadingState.style.display = 'none';
+                pricingSection.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

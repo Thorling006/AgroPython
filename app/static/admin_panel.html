@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - AgroSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern_agro.css">
+</head>
+<body class="page-body">
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4 animate-slide-up">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h1 class="dashboard-title m-0" style="text-align: left;">Administración</h1>
+            <div class="d-flex align-items-center gap-3">
+                <!-- User Profile Summary Section -->
+                <div id="self-profile-section" class="d-flex align-items-center gap-3 p-2 px-3 bg-white shadow-sm border rounded-4 animate-slide-right">
+                    <div class="chat-avatar m-0 bg-warning text-dark border border-warning" id="self-avatar" style="width: 38px; height: 38px; font-size: 14px; font-weight: bold;">?</div>
+                    <div class="d-none d-md-block">
+                        <div class="fw-bold small text-main line-clamp-1" id="self-email">...</div>
+                        <div id="self-role-badge">...</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button id="btn-manage-orgs" class="btn-agro-light px-4 py-2 shadow-sm border-0 d-none" style="border-radius: var(--border-radius-pill); font-size: 14px;">
+                        <i class="bi bi-list-task me-2"></i>Gestionar Cooperativas
+                    </button>
+                    <button id="btn-new-org" class="btn-agro-primary px-4 py-2 shadow-sm border-0 d-none" style="border-radius: var(--border-radius-pill); font-size: 14px;">
+                        <i class="bi bi-plus-circle me-2"></i>Nueva Cooperativa
+                    </button>
+                    <div class="status-badge status-active">Sistema Activo</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="row g-4 mb-5 animate-slide-up animate-delay-1">
+            <div class="col-md-6">
+                <div class="weather-widget d-flex align-items-center justify-content-between p-4 bg-white">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="fs-1 text-primary">👥</div>
+                        <div>
+                            <div class="info-label mb-0">Usuarios Totales</div>
+                            <div class="weather-temp" id="total-users">0</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-light rounded-circle">⚡</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="weather-widget d-flex align-items-center justify-content-between p-4 bg-white">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="fs-1 text-success">🌾</div>
+                        <div>
+                            <div class="info-label mb-0">Cultivos Registrados</div>
+                            <div class="weather-temp" id="total-crops">0</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-light rounded-circle">🌱</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="agro-card border-0 shadow-sm p-0 animate-slide-up animate-delay-2" style="background: var(--card-bg);">
+            <div class="p-4 border-bottom border-light d-flex justify-content-between align-items-center">
+                <h3 class="m-0 fs-5 fw-bold">Gestión de Usuarios</h3>
+                <span class="text-muted small" id="user-count-label">Cargando...</span>
+            </div>
+            
+            <div class="user-list" id="users-tbody">
+                <!-- Injected via JS as modern rows -->
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <a href="dashboard.html" class="btn-secondary d-inline-flex align-items-center gap-2 px-4">
+                <span>←</span> Volver al Panel de Control
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/layout.js"></script>
+
+    <script>
+        async function initAdmin() {
+            if (window.initLayout) await window.initLayout('admin_panel');
+            
+            // Script de limpieza temporal removido satisfactoriamente.
+
+            await AuthObj.requireAdmin();
+
+            const user = await AuthObj.getCurrentUser();
+            const allUsers = await window.DB.getAllUsers(user);
+            
+            // Filter out current user from the general list
+            const users = allUsers.filter(u => u.id !== user.id);
+            
+            const countriesData = await window.DB.getCountries();
+            const countryMap = {};
+            countriesData.forEach(c => countryMap[c.id] = c.name);
+            
+            // Populate Self Profile Section
+            document.getElementById('self-avatar').style.overflow = 'hidden';
+            document.getElementById('self-avatar').style.padding = '0';
+            document.getElementById('self-avatar').innerHTML = user.avatar_url ? `<img src="${user.avatar_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (user.full_name || user.email || '?')[0].toUpperCase();
+            document.getElementById('self-email').innerText = user.full_name || user.email || 'Mi Perfil';
+            
+            let selfRoleMark = '<span class="badge bg-light text-muted border rounded-pill px-2 py-0" style="font-size: 10px;">AGRICULTOR</span>';
+            if (user.role === 'global_owner') selfRoleMark = '<span class="badge bg-warning text-dark border border-warning rounded-pill px-2 py-0 fw-bold" style="font-size: 10px;">CREADOR GLOBAL</span>';
+            else if (user.role === 'ministry_admin') selfRoleMark = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0" style="font-size: 10px;">GOBIERNO (ADMIN)</span>';
+            else if (user.role === 'org_admin') selfRoleMark = '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0" style="font-size: 10px;">COOPERATIVA (ADMIN)</span>';
+            
+            // RESTAURAR VISIBILIDAD DEL PLAN REGIONAL
+            const countryData = countriesData.find(c => String(c.id) === String(user.country_id));
+            const countryPlan = countryData ? (countryData.plan || 'none') : 'none';
+            const userPlan = user.plan && user.plan !== 'none' ? user.plan : 'none';
+            const activePlan = userPlan !== 'none' ? userPlan : countryPlan;
+            
+            const planName = activePlan && activePlan !== 'none' ? activePlan.toUpperCase() : 'BÁSICO';
+            document.getElementById('self-role-badge').innerHTML = `${selfRoleMark} <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0 ms-1" style="font-size: 9px;">PLAN: ${planName}</span>`;
+
+            // Stats
+            document.getElementById('total-users').innerText = allUsers.length;
+            document.getElementById('user-count-label').innerText = `${users.length} miembros gestionables en tu jurisdicción`;
+            
+            let totalCropsCounter = 0;
+            const userListContainer = document.getElementById('users-tbody');
+            let html = '';
+
+            // Se eliminó el return temprano para permitir que el Dueño Global vea los países y la corporación aunque no haya otros usuarios.
+
+            // Decorator helper
+            const renderUserRow = async (u, cooperativesMap = {}) => {
+                try {
+                    const userCrops = await window.DB.getCropsByUser(u.id);
+                    totalCropsCounter += userCrops.length;
+                    
+                    let dDate = "N/A";
+                    if (u.date_joined) {
+                        try {
+                            dDate = new Date(u.date_joined).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                        } catch(e) { console.warn("Fecha inválida para usuario:", u.email); }
+                    }
+                    
+                    let roleMark = '<span class="badge bg-light text-muted border rounded-pill px-2 py-1 ms-2" style="font-size: 10px;">AGRICULTOR</span>';
+                    if (u.role === 'global_owner') roleMark = '<span class="badge bg-warning text-dark border border-warning rounded-pill px-2 py-1 ms-2 fw-bold" style="font-size: 10px;">CREADOR GLOBAL</span>';
+                    else if (u.role === 'ministry_admin') roleMark = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 ms-2" style="font-size: 10px;">GOBIERNO (ADMIN)</span>';
+                    else if (u.role === 'org_admin') roleMark = '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 ms-2" style="font-size: 10px;">COOPERATIVA (ADMIN)</span>';
+                    
+                    if (u.suspension_end && new Date(u.suspension_end) > new Date()) {
+                        roleMark = new Date(u.suspension_end).getFullYear() === 2100 ? 
+                            '<span class="badge rounded-pill px-2 py-1 ms-2 fw-bold" style="background-color:#7f1d1d; color:white; font-size: 10px;">BANEADO</span>' : 
+                            '<span class="badge bg-danger rounded-pill px-2 py-1 ms-2" style="font-size: 10px;">SUSPENDIDO</span>';
+                    }
+
+                    let canDelete = false;
+                    let canManage = true;
+                    if (user.role === 'global_owner') {
+                        canDelete = true;
+                    } else if (user.role === 'ministry_admin') {
+                        canManage = ['farmer', 'org_admin'].includes(u.role);
+                    } else if (user.role === 'org_admin') {
+                        canManage = u.role === 'farmer';
+                    }
+                    if (u.id === user.id) canDelete = false;
+
+                    const orgName = u.org_id ? (cooperativesMap[u.org_id] || `#${u.org_id}`) : '';
+                    const orgBadge = orgName ? `<span class="badge bg-light text-dark ms-2 fw-normal border"><i class="bi bi-building"></i> ${orgName}</span>` : '';
+
+                    const avatarContent = u.avatar_url ? `<img src="${u.avatar_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : (u.full_name || u.email || '?')[0].toUpperCase();
+
+                    return `
+                        <div class="d-flex align-items-center justify-content-between p-3 border-bottom border-light user-row-item hover-bg-light transition-all">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="chat-avatar m-0 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 14px; background: var(--primary-color); overflow:hidden; padding:0;">${avatarContent}</div>
+                                <div>
+                                    <div class="d-flex align-items-center flex-wrap">
+                                        <strong class="text-main">${u.full_name || u.email || 'Sin Email'}</strong>
+                                        ${roleMark} ${orgBadge}
+                                    </div>
+                                    <div class="small text-muted mt-1">Ingreso: ${dDate} • ${userCrops.length} cultivos</div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                ${canManage ? `<a href="admin_user_detail.html?id=${u.id}" class="btn btn-sm btn-outline-primary px-3 rounded-pill" style="font-size: 12px;">Gestionar</a>` : `<a href="chat_detail.html?id=${u.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill" style="font-size: 12px;"><i class="bi bi-chat-dots"></i> Contactar</a>`}
+                                ${canDelete ? `<button onclick="deleteUser('${u.id}')" class="btn btn-sm btn-outline-danger px-3 rounded-pill" style="font-size: 12px;"><i class="bi bi-trash"></i></button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } catch(err) {
+                    console.warn("Error renderizando fila de usuario:", u, err);
+                    return `<div class="p-2 text-danger small border-bottom">Error cargando datos de: ${u.email || 'ID '+u.id}</div>`;
+                }
+            };
+
+            const renderHierarchy = async (groupUsers, countryId, prefix = '') => {
+                let sectionHtml = '';
+                const coopList = await window.DB.getCooperativasByCountry(countryId);
+                const coopMap = {};
+                coopList.forEach(c => coopMap[c.id] = c.name);
+
+                const renderedUserIds = new Set();
+
+                // 1. Creators (Nivel 0)
+                const creators = groupUsers.filter(u => u.role === 'global_owner');
+                if (creators.length > 0) {
+                    sectionHtml += `<div class="bg-warning-subtle p-2 px-3 small fw-bold text-uppercase text-warning-emphasis border-bottom mt-2"><i class="bi bi-star-fill me-2"></i>Creadores Corporativos</div>`;
+                    for (const u of creators) {
+                        sectionHtml += await renderUserRow(u, coopMap);
+                        renderedUserIds.add(u.id);
+                    }
+                }
+
+                // 2. Government Admins (Nivel 1)
+                const govAdmins = groupUsers.filter(u => u.role === 'ministry_admin');
+                if (govAdmins.length > 0) {
+                    sectionHtml += `<div class="bg-light p-2 px-3 small fw-bold text-uppercase text-muted border-bottom mt-3"><i class="bi bi-shield-check me-2"></i>Administradores del Gobierno</div>`;
+                    for (const u of govAdmins) {
+                        sectionHtml += await renderUserRow(u, coopMap);
+                        renderedUserIds.add(u.id);
+                    }
+                }
+
+                // 3. Cooperativas
+                if (coopList.length > 0) {
+                    // Check if there are any users in coops before showing the header
+                    const hasCoopUsers = groupUsers.some(u => u.org_id && coopMap[u.org_id]);
+                    
+                    if (hasCoopUsers) {
+                        sectionHtml += `<div class="bg-light p-2 px-3 small fw-bold text-uppercase text-muted border-bottom mt-3"><i class="bi bi-buildings me-2"></i>Cooperativas</div>`;
+                        sectionHtml += `<div class="accordion accordion-flush" id="coopsAccordion${prefix}">`;
+                        for (let j = 0; j < coopList.length; j++) {
+                            const coop = coopList[j];
+                            const coopUsers = groupUsers.filter(u => String(u.org_id) === String(coop.id));
+                            if (coopUsers.length > 0) {
+                                sectionHtml += `
+                                    <div class="accordion-item border-0 border-bottom border-light">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCoop${prefix}${j}">
+                                                <span class="fw-bold text-success">${coop.name}</span>
+                                                <span class="badge bg-success-subtle text-success rounded-pill ms-3">${coopUsers.length}</span>
+                                            </button>
+                                        </h2>
+                                        <div id="collapseCoop${prefix}${j}" class="accordion-collapse collapse" data-bs-parent="#coopsAccordion${prefix}">
+                                            <div class="accordion-body p-0">
+                                `;
+                                for (const u of coopUsers) {
+                                    sectionHtml += await renderUserRow(u, coopMap);
+                                    renderedUserIds.add(u.id);
+                                }
+                                sectionHtml += `</div></div></div>`;
+                            }
+                        }
+                        sectionHtml += `</div>`;
+                    }
+                }
+
+                // 4. Independent Users (Administradores de Cooperativa o Agricultores sin cooperativa válida)
+                const leftovers = groupUsers.filter(u => !renderedUserIds.has(u.id));
+                
+                if (leftovers.length > 0) {
+                    const independentAdmins = leftovers.filter(u => u.role === 'org_admin' || u.role === 'ministry_admin');
+                    const independentFarmers = leftovers.filter(u => u.role === 'farmer');
+                    const others = leftovers.filter(u => u.role !== 'org_admin' && u.role !== 'ministry_admin' && u.role !== 'farmer');
+
+                    if (independentAdmins.length > 0) {
+                        sectionHtml += `<div class="bg-light p-2 px-3 small fw-bold text-uppercase text-muted border-bottom mt-3"><i class="bi bi-person-badge me-2"></i>Administradores Independientes</div>`;
+                        for (const u of independentAdmins) sectionHtml += await renderUserRow(u, coopMap);
+                    }
+
+                    if (independentFarmers.length > 0) {
+                        sectionHtml += `<div class="bg-light p-2 px-3 small fw-bold text-uppercase text-muted border-bottom mt-3"><i class="bi bi-person me-2"></i>Agricultores Independientes</div>`;
+                        for (const u of independentFarmers) sectionHtml += await renderUserRow(u, coopMap);
+                    }
+                    
+                    if (others.length > 0) {
+                        sectionHtml += `<div class="bg-light p-2 px-3 small fw-bold text-uppercase text-muted border-bottom mt-3"><i class="bi bi-question-circle me-2"></i>Otros Miembros</div>`;
+                        for (const u of others) sectionHtml += await renderUserRow(u, coopMap);
+                    }
+                }
+
+                return sectionHtml;
+            };
+
+            html += `<div class="accordion accordion-flush" id="usersAccordion">`;
+            
+            if (user.role === 'global_owner') {
+                // Determine which ID belongs to the Corporation to put it first (ID 3)
+                const corpId = '3';
+                
+                // Include all countries from the database, even if they have no users yet
+                const baseIds = Object.keys(countryMap).map(String).filter(id => id !== 'undefined' && id !== 'null');
+                const userIds = users.map(u => String(u.country_id || 'null'));
+                const allKeys = [...new Set([...baseIds, ...userIds, corpId, 'null'])];
+
+                const uniqueCountryIds = allKeys.sort((a, b) => {
+                    if (String(a) === String(corpId)) return -1;
+                    if (String(b) === String(corpId)) return 1;
+                    
+                    const countryA = countriesData.find(c => String(c.id) === String(a));
+                    const countryB = countriesData.find(c => String(c.id) === String(b));
+                    const nameA = String(a === 'null' ? 'ZZZ' : (countryA && countryA.name ? countryA.name : a));
+                    const nameB = String(b === 'null' ? 'ZZZ' : (countryB && countryB.name ? countryB.name : b));
+                    
+                    return nameA.localeCompare(nameB);
+                });
+
+                for (let i = 0; i < uniqueCountryIds.length; i++) {
+                    const cid = uniqueCountryIds[i];
+                    const isCorp = String(cid) === String(corpId);
+                    
+                    const countryData = countriesData.find(c => String(c.id) === String(cid));
+                    let countryName;
+                    if (isCorp) {
+                        countryName = 'AgroSmart Corporatión';
+                    } else {
+                        countryName = cid === 'null' ? 'Sin Región Asignada' : (countryData && countryData.name ? countryData.name : cid);
+                    }
+                    countryName = String(countryName || 'Desconocido');
+                    const countryPlan = String(countryData ? (countryData.plan || 'none') : 'none');
+                    
+                    const countryUsers = users.filter(u => String(u.country_id || 'null') === String(cid));
+                    
+                    const iconClass = isCorp ? 'bi-star-fill text-warning' : 'bi-globe-americas text-primary';
+                    const itemStyle = isCorp ? 'border-warning' : '';
+                    const headerStyle = isCorp ? 'bg-warning-subtle text-dark' : 'bg-white';
+                    const badgeClass = isCorp ? 'bg-warning text-dark' : 'bg-primary-subtle text-primary';
+
+                    // License badge style
+                    const planColors = { 'none': 'bg-secondary', 'bronce': 'bg-bronze-agro', 'platinium': 'bg-silver-agro', 'diamante': 'bg-primary', 'esmeralda': 'bg-success' };
+                    const planLabel = countryPlan.toUpperCase();
+
+                    html += `
+                        <div class="accordion-item border-0 mb-3 rounded-4 shadow-sm overflow-hidden ${itemStyle}">
+                            <h2 class="accordion-header">
+                                <div class="accordion-button collapsed ${headerStyle} fw-bold py-3 d-flex align-items-center">
+                                    <div class="flex-grow-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseCountry${i}" style="cursor:pointer;">
+                                        <i class="bi ${iconClass} me-2 fs-5"></i> 
+                                        ${String(countryName).toUpperCase()} 
+                                        ${isCorp ? '<span class="ms-2 badge bg-warning text-dark border border-warning rounded-pill" style="font-size:10px;">CREADORES</span>' : 
+                                          `<span class="ms-2 badge ${planColors[countryPlan] || 'bg-light'} text-white border-0 rounded-pill px-2" style="font-size:9px;">PLAN ${planLabel}</span>`}
+                                        <span class="badge ${badgeClass} rounded-pill ms-3">${countryUsers.length}</span>
+                                    </div>
+                                    ${!isCorp && cid !== 'null' ? `
+                                        <button onclick="manageCountryLicense(${cid}, '${countryPlan}')" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 me-3" style="font-size: 10px;">
+                                            <i class="bi bi-key me-1"></i>Gestionar Licencia
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </h2>
+                            <div id="collapseCountry${i}" class="accordion-collapse collapse" data-bs-parent="#usersAccordion">
+                                <div class="accordion-body p-0 bg-white">
+                                    ${await renderHierarchy(countryUsers, cid, `C${i}`)}
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            } else {
+                // Focus on current jurisdiction
+                html += await renderHierarchy(users, user.country_id, 'Local');
+            }
+            
+            html += `</div>`; // End main accordion
+
+            document.getElementById('total-crops').innerText = totalCropsCounter;
+            userListContainer.innerHTML = html;
+        }
+
+        window.deleteUser = async function(id) {
+            const isConfirmed = await window.confirmActionModal(
+                'Eliminar Usuario',
+                '¿Seguro de que deseas eliminar a este usuario y todos sus cultivos? Esta acción es irreversible.',
+                'Sí, eliminar',
+                'Cancelar'
+            );
+            
+            if(isConfirmed) {
+                try {
+                    await window.DB.deleteUser(id);
+                    window.location.reload();
+                } catch (err) {
+                    window.showErrorModal('Error de Sistema', 'Error al eliminar usuario: ' + err.message);
+                }
+            }
+        };
+
+        async function manageCooperativas() {
+            const currentUser = await window.AuthObj.getCurrentUser();
+            let countryId = currentUser.country_id;
+
+            if (currentUser.role === 'global_owner') {
+                const countries = await window.DB.getCountries();
+                const countryOptions = {};
+                countries.forEach(c => countryOptions[c.id] = c.name);
+
+                const { value: selectedCountry } = await Swal.fire({
+                    title: 'Seleccionar País',
+                    input: 'select',
+                    inputOptions: countryOptions,
+                    inputPlaceholder: 'Ver cooperativas de...',
+                    showCancelButton: true
+                });
+
+                if (!selectedCountry) return;
+                countryId = selectedCountry;
+            }
+
+            Swal.fire({ title: 'Cargando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            const orgs = await window.DB.getCooperativasByCountry(countryId);
+            Swal.close();
+
+            if (orgs.length === 0) {
+                Swal.fire('Sin Cooperativas', 'No hay cooperativas registradas en este país.', 'info');
+                return;
+            }
+
+            let listHtml = '<div class="list-group list-group-flush text-start">';
+            orgs.forEach(o => {
+                listHtml += `
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3 bg-transparent border-light">
+                        <span class="fw-bold">${o.name}</span>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="Swal.clickConfirm(); renameCooperativa(${o.id}, '${o.name}')"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="Swal.clickConfirm(); removeCooperativa(${o.id}, '${o.name}')"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+            listHtml += '</div>';
+
+            await Swal.fire({
+                title: 'Cooperativas en la Región',
+                html: listHtml,
+                showConfirmButton: false,
+                showCloseButton: true,
+                width: '500px'
+            });
+        }
+
+        window.renameCooperativa = async (id, currentName) => {
+            const { value: newName } = await Swal.fire({
+                title: 'Renombrar Cooperativa',
+                input: 'text',
+                inputValue: currentName,
+                showCancelButton: true,
+                inputValidator: (value) => { if (!value) return '¡El nombre es obligatorio!'; }
+            });
+
+            if (newName && newName !== currentName) {
+                try {
+                    await window.DB.updateCooperativa(id, newName);
+                    window.showSuccessModal('Actualizado', `La cooperativa ahora se llama "${newName}".`);
+                    initAdmin(); // Refresh list
+                } catch (err) {
+                    window.showErrorModal('Error', err.message);
+                }
+            }
+        };
+
+        window.removeCooperativa = async (id, name) => {
+            const confirmed = await window.confirmActionModal(
+                'Eliminar Cooperativa',
+                `¿Seguro que deseas eliminar "${name}"? Esto solo funcionará si no hay usuarios vinculados a ella.`,
+                'Sí, eliminar',
+                'Cancelar'
+            );
+
+            if (confirmed) {
+                try {
+                    await window.DB.deleteCooperativa(id);
+                    window.showSuccessModal('Eliminada', `La cooperativa "${name}" ha sido borrada.`);
+                    initAdmin(); // Refresh list
+                } catch (err) {
+                    window.showErrorModal('Error', 'No se pudo eliminar. Probablemente tiene usuarios asociados.');
+                }
+            }
+        };
+
+        async function createNewCooperativa() {
+            const currentUser = await window.AuthObj.getCurrentUser();
+            let countryId = currentUser.country_id;
+
+            if (currentUser.role === 'global_owner') {
+                const countries = await window.DB.getCountries();
+                const countryOptions = {};
+                countries.forEach(c => countryOptions[c.id] = c.name);
+
+                const { value: selectedCountry } = await Swal.fire({
+                    title: 'Seleccionar País para la Cooperativa',
+                    input: 'select',
+                    inputOptions: countryOptions,
+                    inputPlaceholder: 'Donde operará la cooperativa...',
+                    showCancelButton: true
+                });
+
+                if (!selectedCountry) return;
+                countryId = selectedCountry;
+            }
+
+            const { value: name } = await Swal.fire({
+                title: 'Nombre de la Nueva Cooperativa',
+                input: 'text',
+                inputPlaceholder: 'Ej: Cooperativa El Progreso',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value) return '¡El nombre es obligatorio!';
+                }
+            });
+
+            if (name) {
+                try {
+                    await window.DB.createCooperativa(name, countryId);
+                    window.showSuccessModal('Cooperativa Creada', `"${name}" ha sido registrada exitosamente.`);
+                } catch (err) {
+                    window.showErrorModal('Error', err.message);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const currentUser = await window.AuthObj.getCurrentUser();
+            if (['global_owner', 'ministry_admin'].includes(currentUser.role)) {
+                const btnManage = document.getElementById('btn-manage-orgs');
+                const btnNewOrg = document.getElementById('btn-new-org');
+                
+                btnManage.classList.remove('d-none');
+                btnNewOrg.classList.remove('d-none');
+                
+                btnManage.onclick = manageCooperativas;
+                btnNewOrg.onclick = createNewCooperativa;
+            }
+            initAdmin();
+        });
+
+        window.manageCountryLicense = async function(countryId, currentPlan) {
+            const { value: plan } = await Swal.fire({
+                title: 'Gestionar Licencia del País',
+                text: 'Selecciona el plan que se aplicará a todos los administradores y usuarios de esta región.',
+                input: 'select',
+                inputOptions: {
+                    'none': 'Sin Plan (Límite 50 usuarios)',
+                    'bronce': 'Plan Bronce ($350/mes)',
+                    'platinium': 'Plan Platinium ($750/mes)',
+                    'diamante': 'Plan Diamante ($1500/mes)',
+                    'esmeralda': 'Plan Esmeralda ($3000/mes - Ilimitado)'
+                },
+                inputValue: currentPlan,
+                showCancelButton: true,
+                confirmButtonText: 'Aplicar Plan',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (plan) {
+                try {
+                    await window.DB.setCountryPlan(countryId, plan);
+                    window.showSuccessModal('Licencia Actualizada', `El país ahora opera bajo el plan ${plan.toUpperCase()}.`);
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch (err) {
+                    window.showErrorModal('Error', 'No se pudo actualizar la licencia: ' + err.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>

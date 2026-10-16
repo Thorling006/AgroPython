@@ -1,0 +1,55 @@
+<button id="navbar-toggle" class="navbar-toggle" aria-label="Mostrar menú" aria-expanded="true"><i class="bi bi-arrow-left" style="stroke-width: 2px;"></i></button>
+<nav class="navbar open">
+    <div class="navbar-header-logo mb-4">
+        <a class="navbar-brand text-decoration-none d-flex align-items-center gap-2" href="dashboard.html">
+            <img src="img/logo.png" alt="AgroSmart Logo" style="height: 42px; width: auto; object-fit: contain;">
+            <span style="color: var(--text-main); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.5px;">AgroSmart</span>
+        </a>
+    </div>
+    <div id="navbar-menu" class="navbar-menu">
+        <div id="auth-nav-container">
+            <!-- Dynamic Login/Logout button -->
+        </div>
+        <a href="dashboard.html" class="btn-secondary text-nowrap" data-page="dashboard">
+            <i class="bi bi-house-door me-2"></i> Inicio
+        </a>
+        <a href="catalog.html" class="btn-secondary text-nowrap" data-page="catalog" style="display: none;">
+            <i class="bi bi-book me-2"></i> Catálogo
+        </a>
+        <a href="crop_create.html" class="btn-secondary text-nowrap" data-page="crop_create" style="display: none;">
+            <i class="bi bi-plus-circle me-2"></i> Registrar
+        </a>
+        <a href="moon_calendar.html" class="btn-secondary text-nowrap" data-page="moon" style="display: none;">
+            <i class="bi bi-moon-stars me-2"></i> Calendario Lunar
+        </a>
+        <a href="agrored.html" class="btn-secondary position-relative text-nowrap" data-page="agrored" style="display: none;">
+            <i class="bi bi-globe-americas me-2"></i> AgroRed
+            <span id="notificationBadge" class="notification-bubble" style="display:none;">0</span>
+        </a>
+        <a href="plan_dashboard.html" class="btn-secondary text-nowrap" id="nav-plan-link" data-page="plan" style="display: none;">
+            <i class="bi bi-activity me-2"></i> Mi Plan
+        </a>
+        <a href="ai_chat.html" class="btn-secondary text-nowrap" id="nav-ai-link" data-page="ai_chat" style="display: none;">
+            <i class="bi bi-robot me-2" style="color: #68d391;"></i> Agro IA
+        </a>
+        
+        <a href="admin_panel.html" class="btn-secondary admin-panel-btn" data-page="admin_panel" id="nav-admin-link" style="display: none;">
+            <i class="bi bi-speedometer2 me-2"></i> Administración
+        </a>
+        <a href="services.html" class="btn-secondary text-nowrap" data-page="services">
+            <i class="bi bi-gear-wide-connected me-2"></i> Servicios
+        </a>
+        <a href="about.html" class="btn-secondary text-nowrap" data-page="about">
+            <i class="bi bi-info-circle me-2"></i> Nosotros
+        </a>
+        <a href="soporte.html" class="btn-secondary text-nowrap" data-page="soporte">
+            <i class="bi bi-patch-question me-2"></i> Soporte
+        </a>
+        <a href="contact.html" class="btn-secondary text-nowrap" data-page="contact" style="display: none;">
+            <i class="bi bi-envelope me-2"></i> Contacto
+        </a>
+        <div id="logout-nav-container" style="margin-top: auto;">
+            <!-- Logout / Login button goes here at the bottom -->
+        </div>
+    </div>
+</nav>

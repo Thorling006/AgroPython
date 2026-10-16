@@ -1,0 +1,187 @@
+/* Vertical Map Layout */
+.windy-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    margin-top: 1.5rem;
+}
+
+.windy-map-container {
+    flex: 1;
+    height: 65vh;
+    min-height: 500px;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    position: relative; /* required for Cesium */
+    background: #000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.windy-sidebar {
+    width: 380px;
+    flex-shrink: 0;
+    height: 65vh;
+    min-height: 500px;
+    overflow-y: auto;
+    background: #1e1e1e;
+    color: #eee;
+    padding: 30px;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar styles for the sidebar */
+.windy-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+.windy-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.windy-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+.windy-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.windy-sidebar h5 {
+    margin-bottom: 25px !important;
+    font-weight: 700;
+}
+
+.windy-categories-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+/* Category Headers */
+.windy-category {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+}
+
+/* Grid of options */
+.windy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+/* Layer Button */
+.windy-layer-btn {
+    background: #2a2a2a;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    user-select: none;
+    min-height: 90px;
+}
+
+.windy-layer-btn i {
+    font-size: 1.8rem;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.windy-layer-btn span {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.windy-layer-btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+.windy-layer-btn.active {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.15);
+    box-shadow: inset 0 0 10px rgba(245, 158, 11, 0.1);
+    transform: translateY(0);
+}
+
+.windy-layer-btn.active i {
+    color: #f59e0b;
+}
+
+.windy-layer-btn.active span {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Opacity slider for active layers */
+.windy-opacity-wrapper {
+    margin-top: 25px;
+    background: #252525;
+    padding: 20px;
+    border-radius: 12px;
+    display: none;
+    border: 1px solid #333;
+}
+.windy-opacity-wrapper.active {
+    display: block;
+}
+
+.windy-opacity-wrapper label {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    display: block;
+    font-weight: 600;
+}
+
+.windy-opacity-wrapper input[type=range] {
+    width: 100%;
+    accent-color: #f59e0b;
+}
+
+@media (max-width: 992px) {
+    .windy-layout {
+        flex-direction: column;
+    }
+    .windy-sidebar {
+        width: 100%;
+        height: auto;
+        min-height: unset;
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 576px) {
+    .windy-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* HARDWARE ACCELERATION FOR UI SMOOTHNESS */
+/* Forces the GPU to handle UI animations separately from Cesium WebGL, preventing lag */
+.offcanvas, .navbar, .modal, .sidebar-modern {
+    will-change: transform, opacity !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+}
+
