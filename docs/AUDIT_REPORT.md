@@ -66,5 +66,15 @@ dos smoke tests y compilación de módulos.
 - Se generó un token de usuario del sistema Meta sin caducidad con permisos
   `whatsapp_business_messaging` y `whatsapp_business_management`. La consulta de
   solo lectura confirmó el número de prueba en estado `CONNECTED`.
-- No se cambió el webhook, no se enviaron mensajes y el scheduler permanece
-  desactivado hasta validar recordatorios de extremo a extremo.
+- No se cambió el webhook y el scheduler permanece desactivado hasta validar
+  recordatorios de extremo a extremo.
+
+### Prueba controlada de WhatsApp
+
+- La plantilla `hello_world` no existe en la cuenta de prueba y Meta la rechazó
+  sin enviar mensaje (`132001`).
+- Se realizó después un único envío de texto al número de prueba autorizado.
+  Meta aceptó la solicitud y devolvió un `message_id`.
+- La entrega al dispositivo debe confirmarse manualmente; hasta entonces el
+  scheduler continúa desactivado y no se considera validado el recordatorio
+  automático de extremo a extremo.
