@@ -19,11 +19,23 @@ META_SECRET = "meta-test-secret"
 
 def settings() -> Settings:
     return Settings(
+        app_env="development",
         app_session_secret=SECRET,
         meta_app_secret=META_SECRET,
         supabase_url="https://example.supabase.co",
         supabase_service_role_key="test-service-key",
     )
+
+
+def test_public_supabase_key_is_not_accepted_as_service_role():
+    public_key = "sb_publishable_public-test-key"
+    cfg = Settings(
+        app_env="development",
+        supabase_url="https://example.supabase.co",
+        supabase_anon_key=public_key,
+        supabase_service_role_key=public_key,
+    )
+    assert cfg.supabase_ready is False
 
 
 @pytest.fixture

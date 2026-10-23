@@ -30,6 +30,11 @@ Configure en Railway, nunca en Git:
 Railway suministra `PORT`; el comando ya ejecuta Uvicorn con ese puerto. El
 healthcheck es `/health/ready`. Docker usa Linux y el mismo contrato.
 
+`SUPABASE_SERVICE_ROLE_KEY` debe ser una clave privada `service_role`/secret del
+proyecto. La aplicación rechaza claves `sb_publishable_*`, valores de ejemplo y
+el mismo valor usado en `SUPABASE_ANON_KEY`; `/health/ready` devolverá 503 en esos
+casos. Nunca copie esa clave al frontend ni a `/js/config.js`.
+
 ## Validación aislada
 
 1. Compruebe `/health/live`, `/health/ready`, `/`, `/dashboard.html` y

@@ -7,7 +7,7 @@ dos smoke tests y compilación de módulos.
 |---|---|---|---|---|
 | FastAPI/frontend | Probada local | Rutas principales devuelven 200 | Bajo | Validar HTTPS Railway |
 | Docker/Railway | Implementada | Dockerfile, PORT, railway.json | Medio | Build real Railway |
-| Healthchecks | Probada | live/ready | Bajo | Cargar variables |
+| Healthchecks | Probada | live/ready y rechazo de clave pública como service role | Bajo | Cargar clave privada en el servidor |
 | Login backend | Probada por contrato | JWT y rutas protegidas | Alto | Migrar SHA-256 a Argon2 |
 | Aislamiento | Probada | Token prevalece sobre IDs inyectados | Bajo | Validar staging |
 | RLS sensible | Preparada, no aplicada | SQL staging/rollback | Medio | Ejecutar en staging |
@@ -46,3 +46,15 @@ dos smoke tests y compilación de módulos.
 4. Ensayar envío, reintento y reinicio con el número Meta de prueba.
 5. Añadir rate limiting distribuido al login y AI.
 6. Autorizar el cambio de webhook y posterior retiro de n8n.
+
+## Validación Oracle — 23/10/2026
+
+- El contenedor, Redis y el túnel respondieron; login y panel se verificaron con
+  una cuenta existente.
+- Se encontró `SUPABASE_URL` de ejemplo y claves placeholder en el servidor.
+- La URL y la clave pública se recuperaron de la configuración heredada para
+  diagnosticar, pero una clave pública **no sustituye** `service_role`.
+- Falta configurar la clave privada real antes de reiniciar con esta versión y
+  antes de aplicar RLS. Supabase Dashboard requiere inicio de sesión manual.
+- El túnel Quick Tunnel cambió de URL al reiniciarse; se requiere un Named Tunnel
+  o dominio estable para staging.

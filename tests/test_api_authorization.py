@@ -12,7 +12,7 @@ SECRET = "test-session-secret-that-is-long-enough-123"
 
 
 def settings() -> Settings:
-    return Settings(app_session_secret=SECRET, supabase_url="https://example.supabase.co", supabase_service_role_key="test-service-key")
+    return Settings(app_env="development", app_session_secret=SECRET, supabase_url="https://example.supabase.co", supabase_service_role_key="test-service-key")
 
 
 @pytest.fixture

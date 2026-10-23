@@ -43,7 +43,11 @@ class Settings(BaseSettings):
 
     @property
     def supabase_ready(self) -> bool:
-        return bool(self.supabase_url and self.supabase_service_role_key)
+        key = self.supabase_service_role_key.strip()
+        lowered = key.lower()
+        is_placeholder = any(marker in lowered for marker in ("your-", "change-me", "placeholder", "example"))
+        is_public_key = key == self.supabase_anon_key.strip() or key.startswith("sb_publishable_")
+        return bool(self.supabase_url and key and not is_placeholder and not is_public_key)
 
     @property
     def whatsapp_ready(self) -> bool:
