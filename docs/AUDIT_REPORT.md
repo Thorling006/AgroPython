@@ -58,3 +58,13 @@ dos smoke tests y compilación de módulos.
   antes de aplicar RLS. Supabase Dashboard requiere inicio de sesión manual.
 - El túnel Quick Tunnel cambió de URL al reiniciarse; se requiere un Named Tunnel
   o dominio estable para staging.
+- La clave privada de Supabase quedó configurada únicamente en Oracle y
+  `/health/ready` respondió 200 con la validación estricta activa.
+- Gemini se validó mediante `/api/ai/chat` autenticado. La versión
+  `gemini-2.5-flash` fue rechazada por Google; `gemini-3-flash-preview` respondió
+  correctamente y quedó configurada en el servidor.
+- Se generó un token de usuario del sistema Meta sin caducidad con permisos
+  `whatsapp_business_messaging` y `whatsapp_business_management`. La consulta de
+  solo lectura confirmó el número de prueba en estado `CONNECTED`.
+- No se cambió el webhook, no se enviaron mensajes y el scheduler permanece
+  desactivado hasta validar recordatorios de extremo a extremo.

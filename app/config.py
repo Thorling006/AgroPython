@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     meta_verify_token: str = ""
     meta_app_secret: str = ""
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3-flash-preview"
     weather_api_key: str = ""
     openweathermap_api_key: str = ""
     reminder_poll_seconds: int = 60
