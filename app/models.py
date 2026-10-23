@@ -52,10 +52,11 @@ class LoginRequest(BaseModel):
 class RegistrationRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=8, max_length=256)
-    full_name: str = Field(min_length=2, max_length=160)
+    full_name: str | None = Field(default=None, min_length=2, max_length=160)
     phone: str | None = Field(default=None, max_length=32)
     country_id: str | None = None
     org_id: str | None = None
+    whatsapp_opt_in: bool = False
 
 
 class ProfileUpdate(BaseModel):

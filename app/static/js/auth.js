@@ -265,12 +265,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Check if email is already registered
-            if (await window.DB.getUserByEmail(email)) {
-                showError('register-view', 'Este correo ya pertenece a una cuenta.');
-                return;
-            }
-
             const btn = e.target.querySelector('button[type="submit"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creando cuenta...';

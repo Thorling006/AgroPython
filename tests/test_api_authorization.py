@@ -56,6 +56,29 @@ def test_registration_forces_farmer_role_and_server_hash(client, monkeypatch):
     assert "password" not in response.json()["user"]
 
 
+def test_registration_without_name_preserves_whatsapp_opt_in(client, monkeypatch):
+    captured = {}
+
+    async def find(*_): return None
+    async def create(_self, data):
+        captured.update(data)
+        return {"id": "new", **data}
+
+    monkeypatch.setattr("app.routers.auth.SupabaseRepository.find_user_by_email", find)
+    monkeypatch.setattr("app.routers.auth.SupabaseRepository.create_user", create)
+    response = client.post("/api/auth/register", json={
+        "email": "venturaomar569@gmail.com",
+        "password": "12345678",
+        "phone": "70589385",
+        "country_id": "sv-test",
+        "whatsapp_opt_in": True
+    })
+    assert response.status_code == 201
+    assert captured["full_name"] == "venturaomar569"
+    assert captured["phone"] == "+50370589385"
+    assert captured["whatsapp_opt_in"] is True
+
+
 def test_profile_update_cannot_choose_another_user(client, monkeypatch):
     observed = {}
 

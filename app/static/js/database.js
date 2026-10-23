@@ -129,7 +129,8 @@ class Database {
                     full_name: userObj.full_name || userObj.name,
                     phone: userObj.phone || userObj.whatsapp || null,
                     country_id: userObj.country_id || null,
-                    org_id: userObj.org_id || null
+                    org_id: userObj.org_id || null,
+                    whatsapp_opt_in: Boolean(userObj.whatsapp_opt_in)
                 })
             }, false)).user;
         }

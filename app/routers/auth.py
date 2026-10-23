@@ -46,7 +46,7 @@ async def register(payload: RegistrationRequest, request: Request, settings: Set
     row = await repo.create_user({
         "email": email,
         "password": sha256(payload.password.encode()).hexdigest(),
-        "full_name": payload.full_name.strip(),
+        "full_name": payload.full_name.strip() if payload.full_name else email.split("@", 1)[0],
         "phone": phone,
         "whatsapp": phone,
         "role": "farmer",
@@ -54,6 +54,8 @@ async def register(payload: RegistrationRequest, request: Request, settings: Set
         "is_active": True,
         "country_id": payload.country_id,
         "org_id": payload.org_id,
+        "whatsapp_opt_in": payload.whatsapp_opt_in,
+        "whatsapp_verified": False,
     })
     safe = {key: value for key, value in row.items() if key != "password"}
     return {"user": safe}
